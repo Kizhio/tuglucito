@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<!-- saved from url=(0049)file:///C:/Users/Kizhio/Downloads/contahc-v2.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContaHC · Calcula tus hidratos</title>
+<link href="./ContaHC ·HURS_files/css2" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #F7F3ED; --white: #FDFAF7;
+  --terracotta: #B85C38; --terra-light: #D4795A; --terra-bg: rgba(184,92,56,0.08);
+  --sage: #5C7A5F; --sage-light: #8AAD8D; --sage-bg: rgba(92,122,95,0.1);
+  --brown: #2E1F14; --brown-mid: #6B4F3A; --brown-light: #9C7A63;
+  --gold: #C49A2C; --gold-bg: rgba(196,154,44,0.12);
+  --border: #E2D9CF; --shadow: 0 2px 12px rgba(46,31,20,0.08);
+  --purple: #6B5B8A; --purple-bg: rgba(107,91,138,0.08);
+}
+body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--brown); min-height:100vh; display:flex; flex-direction:column; }
+
+/* HEADER */
+header { background:var(--brown); padding:0 20px; height:56px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; box-shadow:0 2px 16px rgba(0,0,0,0.2); }
+.logo { font-family:'Fraunces',serif; font-size:1.35rem; font-weight:500; color:var(--cream); }
+.logo span { color:#E8845A; }
+.total-pill { background:var(--terracotta); color:white; padding:5px 14px; border-radius:20px; font-size:0.82rem; font-weight:600; transition:all 0.3s; }
+.total-pill.active { background:var(--sage); animation:popIn 0.25s ease; }
+@keyframes popIn { 0%{transform:scale(1)} 50%{transform:scale(1.1)} 100%{transform:scale(1)} }
+
+/* TABS */
+.tabs { background:var(--white); border-bottom:1.5px solid var(--border); display:flex; position:sticky; top:56px; z-index:100; }
+.tab-btn { flex:1; padding:13px 8px; background:none; border:none; font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:500; color:var(--brown-light); cursor:pointer; transition:all 0.2s; border-bottom:2.5px solid transparent; display:flex; flex-direction:column; align-items:center; gap:2px; }
+.tab-btn .tab-icon { font-size:1.1rem; }
+.tab-btn:hover { color:var(--terracotta); }
+.tab-btn.active { color:var(--terracotta); border-bottom-color:var(--terracotta); }
+
+/* PANELS */
+.panel { display:none; flex:1; }
+.panel.active { display:flex; flex-direction:column; }
+
+/* ── LAYOUT COMPARTIDO ── */
+.split-layout { display:flex; flex:1; max-width:900px; margin:0 auto; width:100%; }
+.col-main { flex:1; padding:20px; min-width:0; overflow-y:auto; }
+.col-plate { width:280px; background:var(--white); border-left:1.5px solid var(--border); padding:16px; display:flex; flex-direction:column; position:sticky; top:112px; height:calc(100vh - 112px); overflow-y:auto; }
+
+/* SEARCH */
+.search-wrap { position:relative; margin-bottom:16px; }
+.search-wrap input { width:100%; padding:11px 16px 11px 42px; background:var(--white); border:1.5px solid var(--border); border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.92rem; color:var(--brown); outline:none; transition:border-color 0.2s; }
+.search-wrap input:focus { border-color:var(--terracotta); }
+.search-wrap input::placeholder { color:var(--brown-light); }
+.search-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:1rem; pointer-events:none; }
+
+/* CATEGORIES */
+.cat-bar { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+.cat-btn { padding:5px 12px; border-radius:20px; border:1.5px solid var(--border); background:var(--white); font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:500; color:var(--brown-mid); cursor:pointer; transition:all 0.18s; white-space:nowrap; }
+.cat-btn:hover { border-color:var(--terracotta); color:var(--terracotta); }
+.cat-btn.active { background:var(--terracotta); border-color:var(--terracotta); color:white; }
+
+/* SECTION TITLE */
+.section-title { font-family:'Fraunces',serif; font-size:0.95rem; font-weight:500; color:var(--brown); margin-bottom:8px; padding-bottom:6px; border-bottom:1.5px solid var(--border); }
+
+/* ─── PLATOS ─── */
+.dishes-grid { display:flex; flex-direction:column; gap:4px; margin-bottom:24px; }
+.dish-card { background:var(--white); border:1.5px solid var(--border); border-radius:12px; overflow:hidden; transition:all 0.18s; }
+.dish-card:hover { border-color:var(--terracotta); }
+.dish-header { display:flex; align-items:center; padding:11px 14px; gap:10px; cursor:pointer; }
+.dish-emoji { font-size:1.3rem; flex-shrink:0; }
+.dish-info { flex:1; min-width:0; }
+.dish-name { font-size:0.9rem; font-weight:500; color:var(--brown); }
+.dish-desc { font-size:0.75rem; color:var(--brown-light); font-weight:300; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dish-hc-badge { background:var(--terra-bg); color:var(--terracotta); font-size:0.78rem; font-weight:600; padding:4px 10px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
+.dish-expand { background:none; border:none; font-size:1rem; cursor:pointer; color:var(--brown-light); transition:transform 0.2s; flex-shrink:0; }
+.dish-card.open .dish-expand { transform:rotate(180deg); }
+.dish-detail { display:none; padding:0 14px 12px; border-top:1px solid var(--border); }
+.dish-card.open .dish-detail { display:block; }
+.dish-ingredients { list-style:none; margin-bottom:10px; padding-top:10px; }
+.dish-ingredients li { font-size:0.78rem; color:var(--brown-mid); font-weight:300; line-height:1.7; display:flex; justify-content:space-between; }
+.dish-ingredients li span { color:var(--terracotta); font-weight:500; }
+.dish-add-btn { width:100%; background:var(--terracotta); color:white; border:none; border-radius:8px; padding:9px; font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; transition:all 0.2s; }
+.dish-add-btn:hover { background:var(--terra-light); }
+
+/* ─── INGREDIENTES ─── */
+.food-grid { display:flex; flex-direction:column; gap:4px; }
+.food-item { display:flex; align-items:center; padding:9px 12px; background:var(--white); border:1.5px solid var(--border); border-radius:10px; gap:8px; }
+.food-name { flex:1; font-size:0.86rem; color:var(--brown); }
+.food-portions { display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }
+.portion-btn { background:var(--cream); border:1px solid var(--border); border-radius:6px; padding:3px 8px; font-size:0.7rem; font-weight:500; color:var(--brown-mid); cursor:pointer; transition:all 0.15s; white-space:nowrap; font-family:'DM Sans',sans-serif; }
+.portion-btn:hover { background:var(--terracotta); border-color:var(--terracotta); color:white; }
+
+/* ─── MIS PLATOS ─── */
+.mis-platos-intro { background:var(--gold-bg); border:1.5px solid rgba(196,154,44,0.2); border-radius:14px; padding:14px 16px; margin-bottom:20px; font-size:0.82rem; color:var(--brown-mid); line-height:1.5; font-weight:300; }
+.mis-platos-intro strong { font-weight:600; color:var(--brown); display:block; margin-bottom:2px; }
+
+.new-dish-form { background:var(--white); border:1.5px solid var(--border); border-radius:14px; padding:16px; margin-bottom:20px; }
+.form-label { font-size:0.72rem; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--brown-mid); margin-bottom:6px; display:block; }
+.form-input { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-family:'DM Sans',sans-serif; font-size:0.88rem; color:var(--brown); outline:none; background:var(--cream); margin-bottom:12px; transition:border-color 0.2s; }
+.form-input:focus { border-color:var(--gold); }
+.form-row { display:flex; gap:8px; margin-bottom:12px; }
+.form-row .form-input { margin-bottom:0; }
+.save-dish-btn { width:100%; background:var(--gold); color:white; border:none; border-radius:9px; padding:10px; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+.save-dish-btn:hover { background:#B8882A; }
+
+.custom-dishes { display:flex; flex-direction:column; gap:6px; }
+.custom-dish { background:var(--white); border:1.5px solid var(--border); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; animation:slideIn 0.2s ease; }
+@keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.custom-dish-info { flex:1; }
+.custom-dish-name { font-size:0.9rem; font-weight:500; color:var(--brown); }
+.custom-dish-detail { font-size:0.75rem; color:var(--brown-light); font-weight:300; margin-top:1px; }
+.custom-dish-hc { font-size:0.82rem; font-weight:600; color:var(--purple); background:var(--purple-bg); padding:4px 10px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
+.custom-dish-add { background:var(--purple); color:white; border:none; border-radius:8px; padding:6px 12px; font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:500; cursor:pointer; flex-shrink:0; transition:all 0.2s; }
+.custom-dish-add:hover { opacity:0.85; }
+.custom-dish-del { background:none; border:none; color:var(--brown-light); cursor:pointer; font-size:1rem; padding:2px 4px; flex-shrink:0; transition:color 0.15s; }
+.custom-dish-del:hover { color:#C43A3A; }
+.empty-custom { text-align:center; padding:32px 16px; color:var(--brown-light); font-size:0.85rem; font-weight:300; line-height:1.6; }
+
+/* ─── MI PLATO (columna derecha) ─── */
+.plate-title { font-family:'Fraunces',serif; font-size:1rem; font-weight:500; color:var(--brown); margin-bottom:2px; }
+.plate-sub { font-size:0.72rem; color:var(--brown-light); font-weight:300; margin-bottom:14px; }
+.plate-empty-msg { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:var(--brown-light); padding:16px; }
+.plate-empty-msg .e-icon { font-size:2.5rem; margin-bottom:8px; }
+.plate-empty-msg p { font-size:0.78rem; font-weight:300; line-height:1.5; }
+.plate-list { flex:1; display:flex; flex-direction:column; gap:5px; overflow-y:auto; margin-bottom:12px; }
+.plate-item { display:flex; align-items:flex-start; gap:6px; background:var(--cream); border-radius:9px; padding:7px 9px; animation:slideIn 0.2s ease; }
+.pi-info { flex:1; min-width:0; }
+.pi-name { font-size:0.78rem; font-weight:500; color:var(--brown); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pi-portion { font-size:0.68rem; color:var(--brown-light); font-weight:300; }
+.pi-hc { font-size:0.8rem; font-weight:600; color:var(--terracotta); white-space:nowrap; }
+.pi-del { background:none; border:none; color:var(--brown-light); cursor:pointer; font-size:0.85rem; flex-shrink:0; padding:0 2px; transition:color 0.15s; }
+.pi-del:hover { color:#C43A3A; }
+
+.total-card { background:var(--sage); border-radius:12px; padding:14px; text-align:center; color:white; margin-bottom:8px; }
+.tc-label { font-size:0.68rem; font-weight:500; letter-spacing:1px; text-transform:uppercase; opacity:0.8; margin-bottom:3px; }
+.tc-num { font-family:'Fraunces',serif; font-size:2rem; font-weight:500; line-height:1; }
+.tc-unit { font-size:0.75rem; opacity:0.8; }
+.tc-rac { font-size:0.78rem; opacity:0.85; margin-top:3px; }
+.clear-btn { width:100%; background:none; border:1.5px solid var(--border); border-radius:9px; padding:8px; font-family:'DM Sans',sans-serif; font-size:0.78rem; color:var(--brown-mid); cursor:pointer; transition:all 0.2s; margin-bottom:8px; }
+.clear-btn:hover { border-color:#C43A3A; color:#C43A3A; }
+.disclaimer-txt { font-size:0.67rem; color:var(--brown-light); line-height:1.4; text-align:center; font-weight:300; }
+
+/* INSTALL */
+.install-toggle { background:none; border:none; font-family:'DM Sans',sans-serif; font-size:0.68rem; color:var(--brown-light); cursor:pointer; width:100%; text-align:center; padding:8px 4px 2px; border-top:1px solid var(--border); margin-top:6px; }
+.install-toggle:hover { color:var(--terracotta); }
+.install-body { display:none; padding-top:8px; }
+.install-body.open { display:block; }
+.install-os { margin-bottom:8px; }
+.install-os strong { font-size:0.7rem; color:var(--brown-mid); display:block; margin-bottom:2px; }
+.install-os ol { padding-left:14px; }
+.install-os li { font-size:0.68rem; color:var(--brown-light); line-height:1.7; font-weight:300; }
+
+.no-results { text-align:center; padding:32px 16px; color:var(--brown-light); font-size:0.85rem; font-weight:300; }
+
+/* MOBILE */
+@media(max-width:640px){
+  .split-layout { flex-direction:column; }
+  .col-plate { width:100%; position:fixed; bottom:0; left:0; right:0; top:auto; height:auto; max-height:50vh; border-left:none; border-top:2px solid var(--border); border-radius:20px 20px 0 0; box-shadow:0 -4px 24px rgba(0,0,0,0.12); z-index:50; }
+  .col-main { padding-bottom:260px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Conta<span>HC</span></div>
+  <div class="total-pill" id="header-total">0 g HC</div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="platos">
+    <span class="tab-icon">🍽️</span>Platos
+  </button>
+  <button class="tab-btn" data-tab="ingredientes">
+    <span class="tab-icon">🥦</span>Ingredientes
+  </button>
+  <button class="tab-btn" data-tab="misplatos">
+    <span class="tab-icon">⭐</span>Mis platos
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL 1: PLATOS -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="panel active" id="panel-platos">
+  <div class="split-layout">
+    <div class="col-main">
+
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="platos-search" placeholder="Buscar plato... ej: lentejas, paella, tortilla...">
+      </div>
+
+      <div class="cat-bar" id="platos-cats">
+        <button class="cat-btn active" data-cat="all">Todos</button>
+        <button class="cat-btn" data-cat="primeros">🥘 Primeros</button>
+        <button class="cat-btn" data-cat="segundos">🍗 Segundos</button>
+        <button class="cat-btn" data-cat="desayuno">☕ Desayuno</button>
+        <button class="cat-btn" data-cat="ensaladas">🥗 Ensaladas</button>
+        <button class="cat-btn" data-cat="postres">🍮 Postres</button>
+        <button class="cat-btn" data-cat="snacks">🥪 Snacks</button>
+      </div>
+
+      <div id="platos-list"><div style="margin-bottom:24px"><div class="section-title">🥘 Primeros platos</div><div class="dishes-grid">
+    <div class="dish-card" id="dc-d1">
+      <div class="dish-header">
+        <span class="dish-emoji">🍲</span>
+        <div class="dish-info">
+          <div class="dish-name">Lentejas estofadas</div>
+          <div class="dish-desc">Lentejas, zanahoria, patata, chorizo</div>
+        </div>
+        <div class="dish-hc-badge">45g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Lentejas hervidas (200g)<span>40g HC</span></li><li>Patata hervida (50g)<span>8g HC</span></li><li>Zanahoria (30g)<span>2g HC</span></li><li>Chorizo (sin HC) (30g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d1">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d2">
+      <div class="dish-header">
+        <span class="dish-emoji">🫘</span>
+        <div class="dish-info">
+          <div class="dish-name">Cocido madrileño</div>
+          <div class="dish-desc">Garbanzos, fideos, patata, verduras</div>
+        </div>
+        <div class="dish-hc-badge">55g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Garbanzos hervidos (150g)<span>27g HC</span></li><li>Fideos/pasta hervida (80g)<span>20g HC</span></li><li>Patata hervida (60g)<span>9g HC</span></li><li>Verduras (sin HC) (100g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d2">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d3">
+      <div class="dish-header">
+        <span class="dish-emoji">🍚</span>
+        <div class="dish-info">
+          <div class="dish-name">Arroz blanco</div>
+          <div class="dish-desc">Plato mediano de arroz hervido</div>
+        </div>
+        <div class="dish-hc-badge">40g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Arroz blanco hervido (160g)<span>40g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d3">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d4">
+      <div class="dish-header">
+        <span class="dish-emoji">🥘</span>
+        <div class="dish-info">
+          <div class="dish-name">Paella</div>
+          <div class="dish-desc">Arroz, guisantes, verduras</div>
+        </div>
+        <div class="dish-hc-badge">50g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Arroz blanco hervido (160g)<span>40g HC</span></li><li>Guisantes (50g)<span>5g HC</span></li><li>Pimiento (30g)<span>2g HC</span></li><li>Tomate (30g)<span>1g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d4">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d5">
+      <div class="dish-header">
+        <span class="dish-emoji">🍝</span>
+        <div class="dish-info">
+          <div class="dish-name">Macarrones con tomate</div>
+          <div class="dish-desc">Pasta con salsa de tomate</div>
+        </div>
+        <div class="dish-hc-badge">52g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pasta hervida (180g)<span>45g HC</span></li><li>Salsa de tomate (100g)<span>8g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d5">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d6">
+      <div class="dish-header">
+        <span class="dish-emoji">🍜</span>
+        <div class="dish-info">
+          <div class="dish-name">Espaguetis boloñesa</div>
+          <div class="dish-desc">Pasta con carne y tomate</div>
+        </div>
+        <div class="dish-hc-badge">50g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pasta hervida (180g)<span>45g HC</span></li><li>Salsa boloñesa (150g)<span>5g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d6">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d7">
+      <div class="dish-header">
+        <span class="dish-emoji">🥣</span>
+        <div class="dish-info">
+          <div class="dish-name">Crema de verduras</div>
+          <div class="dish-desc">Zanahoria, calabacín, patata</div>
+        </div>
+        <div class="dish-hc-badge">18g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Patata hervida (80g)<span>12g HC</span></li><li>Zanahoria (70g)<span>5g HC</span></li><li>Calabacín (100g)<span>3g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d7">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d8">
+      <div class="dish-header">
+        <span class="dish-emoji">🥗</span>
+        <div class="dish-info">
+          <div class="dish-name">Sopa de fideos</div>
+          <div class="dish-desc">Caldo con fideos y verdura</div>
+        </div>
+        <div class="dish-hc-badge">18g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Fideos/pasta hervida (60g)<span>15g HC</span></li><li>Zanahoria (30g)<span>2g HC</span></li><li>Caldo (sin HC) (200g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d8">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d9">
+      <div class="dish-header">
+        <span class="dish-emoji">🫕</span>
+        <div class="dish-info">
+          <div class="dish-name">Judías blancas con chorizo</div>
+          <div class="dish-desc">Alubias estofadas</div>
+        </div>
+        <div class="dish-hc-badge">36g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Judías blancas hervidas (200g)<span>36g HC</span></li><li>Chorizo (sin HC) (30g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d9">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d10">
+      <div class="dish-header">
+        <span class="dish-emoji">🥘</span>
+        <div class="dish-info">
+          <div class="dish-name">Fabada asturiana</div>
+          <div class="dish-desc">Fabes, chorizo, morcilla</div>
+        </div>
+        <div class="dish-hc-badge">40g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Judías blancas hervidas (200g)<span>36g HC</span></li><li>Chorizo y embutido (50g)<span>2g HC</span></li><li>Caldo (100g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d10">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d11">
+      <div class="dish-header">
+        <span class="dish-emoji">🍲</span>
+        <div class="dish-info">
+          <div class="dish-name">Puchero andaluz</div>
+          <div class="dish-desc">Garbanzos, patata, verduras</div>
+        </div>
+        <div class="dish-hc-badge">50g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Garbanzos hervidos (150g)<span>27g HC</span></li><li>Patata hervida (100g)<span>15g HC</span></li><li>Verduras (100g)<span>5g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d11">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d12">
+      <div class="dish-header">
+        <span class="dish-emoji">🍚</span>
+        <div class="dish-info">
+          <div class="dish-name">Arroz con leche</div>
+          <div class="dish-desc">Postre de arroz con leche y azúcar</div>
+        </div>
+        <div class="dish-hc-badge">42g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Arroz blanco hervido (80g)<span>20g HC</span></li><li>Leche (200g)<span>10g HC</span></li><li>Azúcar (20g)<span>20g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d12">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d13">
+      <div class="dish-header">
+        <span class="dish-emoji">🥦</span>
+        <div class="dish-info">
+          <div class="dish-name">Menestra de verduras</div>
+          <div class="dish-desc">Verduras variadas estofadas</div>
+        </div>
+        <div class="dish-hc-badge">18g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Guisantes (100g)<span>9g HC</span></li><li>Zanahoria (80g)<span>6g HC</span></li><li>Judías verdes (100g)<span>4g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d13">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d14">
+      <div class="dish-header">
+        <span class="dish-emoji">🍲</span>
+        <div class="dish-info">
+          <div class="dish-name">Potaje de garbanzos con espinacas</div>
+          <div class="dish-desc">Garbanzos, espinacas, tomate</div>
+        </div>
+        <div class="dish-hc-badge">30g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Garbanzos hervidos (150g)<span>27g HC</span></li><li>Espinacas (sin HC) (100g)<span>1g HC</span></li><li>Tomate (50g)<span>2g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d14">➕ Añadir al plato</button>
+      </div>
+    </div>
+  </div></div><div style="margin-bottom:24px"><div class="section-title">🍗 Segundos platos</div><div class="dishes-grid">
+    <div class="dish-card" id="dc-d20">
+      <div class="dish-header">
+        <span class="dish-emoji">🥚</span>
+        <div class="dish-info">
+          <div class="dish-name">Tortilla de patatas</div>
+          <div class="dish-desc">Huevo y patata frita</div>
+        </div>
+        <div class="dish-hc-badge">24g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Patata frita (120g)<span>20g HC</span></li><li>Huevo (sin HC) (100g)<span>0g HC</span></li><li>Cebolla (30g)<span>2g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d20">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d21">
+      <div class="dish-header">
+        <span class="dish-emoji">🍗</span>
+        <div class="dish-info">
+          <div class="dish-name">Pollo a la plancha con arroz</div>
+          <div class="dish-desc">Pechuga y guarnición de arroz</div>
+        </div>
+        <div class="dish-hc-badge">40g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Arroz blanco hervido (160g)<span>40g HC</span></li><li>Pollo a la plancha (sin HC) (150g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d21">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d22">
+      <div class="dish-header">
+        <span class="dish-emoji">🐟</span>
+        <div class="dish-info">
+          <div class="dish-name">Merluza con patatas</div>
+          <div class="dish-desc">Merluza al horno con patata asada</div>
+        </div>
+        <div class="dish-hc-badge">18g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Patata al horno (100g)<span>14g HC</span></li><li>Merluza (sin HC) (150g)<span>0g HC</span></li><li>Tomate (50g)<span>2g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d22">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d23">
+      <div class="dish-header">
+        <span class="dish-emoji">🥩</span>
+        <div class="dish-info">
+          <div class="dish-name">Filete con patatas fritas</div>
+          <div class="dish-desc">Carne con patatas fritas</div>
+        </div>
+        <div class="dish-hc-badge">30g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Patatas fritas caseras (100g)<span>25g HC</span></li><li>Carne a la plancha (sin HC) (150g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d23">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d24">
+      <div class="dish-header">
+        <span class="dish-emoji">🥚</span>
+        <div class="dish-info">
+          <div class="dish-name">Huevos fritos con patatas</div>
+          <div class="dish-desc">Huevos fritos y patatas</div>
+        </div>
+        <div class="dish-hc-badge">25g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Patatas fritas caseras (80g)<span>20g HC</span></li><li>Huevo frito (sin HC) (60g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d24">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d25">
+      <div class="dish-header">
+        <span class="dish-emoji">🍕</span>
+        <div class="dish-info">
+          <div class="dish-name">Pizza margarita</div>
+          <div class="dish-desc">Media pizza</div>
+        </div>
+        <div class="dish-hc-badge">50g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pizza base+tomate (200g)<span>50g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d25">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d26">
+      <div class="dish-header">
+        <span class="dish-emoji">🥗</span>
+        <div class="dish-info">
+          <div class="dish-name">Ensaladilla rusa</div>
+          <div class="dish-desc">Patata, zanahoria, guisantes, atún</div>
+        </div>
+        <div class="dish-hc-badge">20g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Patata hervida (80g)<span>12g HC</span></li><li>Zanahoria (50g)<span>3g HC</span></li><li>Guisantes (30g)<span>3g HC</span></li><li>Atún y mayonesa (sin HC) (60g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d26">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d27">
+      <div class="dish-header">
+        <span class="dish-emoji">🥙</span>
+        <div class="dish-info">
+          <div class="dish-name">Empanada gallega (porción)</div>
+          <div class="dish-desc">Masa con relleno de atún o carne</div>
+        </div>
+        <div class="dish-hc-badge">35g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Masa de empanada (100g)<span>35g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d27">➕ Añadir al plato</button>
+      </div>
+    </div>
+  </div></div><div style="margin-bottom:24px"><div class="section-title">☕ Desayuno y merienda</div><div class="dishes-grid">
+    <div class="dish-card" id="dc-d30">
+      <div class="dish-header">
+        <span class="dish-emoji">🥐</span>
+        <div class="dish-info">
+          <div class="dish-name">Tostada con aceite</div>
+          <div class="dish-desc">Pan tostado con aceite de oliva</div>
+        </div>
+        <div class="dish-hc-badge">25g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pan tostado (40g)<span>24g HC</span></li><li>Aceite (sin HC) (10g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d30">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d31">
+      <div class="dish-header">
+        <span class="dish-emoji">🥞</span>
+        <div class="dish-info">
+          <div class="dish-name">Tostada con mermelada</div>
+          <div class="dish-desc">Pan tostado con mermelada</div>
+        </div>
+        <div class="dish-hc-badge">32g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pan tostado (40g)<span>24g HC</span></li><li>Mermelada normal (20g)<span>11g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d31">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d32">
+      <div class="dish-header">
+        <span class="dish-emoji">🥣</span>
+        <div class="dish-info">
+          <div class="dish-name">Cereales con leche</div>
+          <div class="dish-desc">Tazón de cereales de desayuno</div>
+        </div>
+        <div class="dish-hc-badge">42g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Cereales desayuno (40g)<span>27g HC</span></li><li>Leche (150g)<span>7g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d32">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d33">
+      <div class="dish-header">
+        <span class="dish-emoji">🥣</span>
+        <div class="dish-info">
+          <div class="dish-name">Avena con leche</div>
+          <div class="dish-desc">Porridge de avena</div>
+        </div>
+        <div class="dish-hc-badge">34g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Avena (copos) (50g)<span>29g HC</span></li><li>Leche (150g)<span>7g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d33">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d34">
+      <div class="dish-header">
+        <span class="dish-emoji">☕</span>
+        <div class="dish-info">
+          <div class="dish-name">Café con leche y galletas</div>
+          <div class="dish-desc">Tazón con 3 galletas María</div>
+        </div>
+        <div class="dish-hc-badge">25g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Leche (150g)<span>7g HC</span></li><li>Galletas María x3 (21g)<span>15g HC</span></li><li>Azúcar sobre (8g)<span>8g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d34">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d35">
+      <div class="dish-header">
+        <span class="dish-emoji">🥐</span>
+        <div class="dish-info">
+          <div class="dish-name">Cruasán</div>
+          <div class="dish-desc">Cruasán solo</div>
+        </div>
+        <div class="dish-hc-badge">28g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Cruasán (60g)<span>28g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d35">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d36">
+      <div class="dish-header">
+        <span class="dish-emoji">🍞</span>
+        <div class="dish-info">
+          <div class="dish-name">Bocadillo de jamón</div>
+          <div class="dish-desc">Pan de barra con jamón serrano</div>
+        </div>
+        <div class="dish-hc-badge">45g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pan blanco (barra) (90g)<span>45g HC</span></li><li>Jamón serrano (sin HC) (40g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d36">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d37">
+      <div class="dish-header">
+        <span class="dish-emoji">🧇</span>
+        <div class="dish-info">
+          <div class="dish-name">Magdalenas (2 unidades)</div>
+          <div class="dish-desc">Dos magdalenas caseras</div>
+        </div>
+        <div class="dish-hc-badge">52g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Magdalena x2 (100g)<span>52g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d37">➕ Añadir al plato</button>
+      </div>
+    </div>
+  </div></div><div style="margin-bottom:24px"><div class="section-title">🥗 Ensaladas y sopas frías</div><div class="dishes-grid">
+    <div class="dish-card" id="dc-d40">
+      <div class="dish-header">
+        <span class="dish-emoji">🥗</span>
+        <div class="dish-info">
+          <div class="dish-name">Ensalada mixta</div>
+          <div class="dish-desc">Lechuga, tomate, cebolla, atún</div>
+        </div>
+        <div class="dish-hc-badge">8g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Lechuga (100g)<span>2g HC</span></li><li>Tomate (100g)<span>3g HC</span></li><li>Cebolla (30g)<span>2g HC</span></li><li>Atún (sin HC) (60g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d40">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d41">
+      <div class="dish-header">
+        <span class="dish-emoji">🥗</span>
+        <div class="dish-info">
+          <div class="dish-name">Ensalada de pasta</div>
+          <div class="dish-desc">Pasta fría con verduras</div>
+        </div>
+        <div class="dish-hc-badge">42g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pasta hervida (160g)<span>40g HC</span></li><li>Tomate (50g)<span>2g HC</span></li><li>Atún (sin HC) (60g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d41">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d42">
+      <div class="dish-header">
+        <span class="dish-emoji">🥗</span>
+        <div class="dish-info">
+          <div class="dish-name">Ensalada de arroz</div>
+          <div class="dish-desc">Arroz frío con atún y verduras</div>
+        </div>
+        <div class="dish-hc-badge">38g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Arroz blanco hervido (140g)<span>36g HC</span></li><li>Tomate (50g)<span>2g HC</span></li><li>Atún (sin HC) (60g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d42">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d43">
+      <div class="dish-header">
+        <span class="dish-emoji">🥗</span>
+        <div class="dish-info">
+          <div class="dish-name">Gazpacho</div>
+          <div class="dish-desc">Vaso de gazpacho andaluz</div>
+        </div>
+        <div class="dish-hc-badge">8g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Tomate (150g)<span>5g HC</span></li><li>Pimiento (30g)<span>2g HC</span></li><li>Pan (miga) (10g)<span>5g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d43">➕ Añadir al plato</button>
+      </div>
+    </div>
+  </div></div><div style="margin-bottom:24px"><div class="section-title">🍮 Postres</div><div class="dishes-grid">
+    <div class="dish-card" id="dc-d50">
+      <div class="dish-header">
+        <span class="dish-emoji">🍮</span>
+        <div class="dish-info">
+          <div class="dish-name">Flan casero</div>
+          <div class="dish-desc">Flan de huevo con caramelo</div>
+        </div>
+        <div class="dish-hc-badge">25g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Flan (110g)<span>22g HC</span></li><li>Caramelo (10g)<span>8g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d50">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d51">
+      <div class="dish-header">
+        <span class="dish-emoji">🍦</span>
+        <div class="dish-info">
+          <div class="dish-name">Helado de crema (bola)</div>
+          <div class="dish-desc">Una bola de helado</div>
+        </div>
+        <div class="dish-hc-badge">22g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Helado de crema (100g)<span>22g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d51">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d52">
+      <div class="dish-header">
+        <span class="dish-emoji">🍊</span>
+        <div class="dish-info">
+          <div class="dish-name">Naranja de postre</div>
+          <div class="dish-desc">Una naranja mediana</div>
+        </div>
+        <div class="dish-hc-badge">18g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Naranja (200g)<span>18g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d52">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d53">
+      <div class="dish-header">
+        <span class="dish-emoji">🍎</span>
+        <div class="dish-info">
+          <div class="dish-name">Manzana de postre</div>
+          <div class="dish-desc">Una manzana mediana</div>
+        </div>
+        <div class="dish-hc-badge">24g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Manzana (200g)<span>24g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d53">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d54">
+      <div class="dish-header">
+        <span class="dish-emoji">🍌</span>
+        <div class="dish-info">
+          <div class="dish-name">Plátano de postre</div>
+          <div class="dish-desc">Un plátano pequeño</div>
+        </div>
+        <div class="dish-hc-badge">20g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Plátano (100g)<span>20g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d54">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d55">
+      <div class="dish-header">
+        <span class="dish-emoji">🍮</span>
+        <div class="dish-info">
+          <div class="dish-name">Natillas</div>
+          <div class="dish-desc">Tarrina de natillas</div>
+        </div>
+        <div class="dish-hc-badge">22g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Natillas (125g)<span>22g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d55">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d56">
+      <div class="dish-header">
+        <span class="dish-emoji">🍰</span>
+        <div class="dish-info">
+          <div class="dish-name">Pastel de chocolate (porción)</div>
+          <div class="dish-desc">Ración de 100g</div>
+        </div>
+        <div class="dish-hc-badge">45g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Bizcocho/bollería (60g)<span>31g HC</span></li><li>Chocolate con leche (30g)<span>17g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d56">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d57">
+      <div class="dish-header">
+        <span class="dish-emoji">🍨</span>
+        <div class="dish-info">
+          <div class="dish-name">Arroz con leche</div>
+          <div class="dish-desc">Ración casera</div>
+        </div>
+        <div class="dish-hc-badge">40g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Arroz blanco hervido (80g)<span>20g HC</span></li><li>Leche (200g)<span>10g HC</span></li><li>Azúcar (15g)<span>15g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d57">➕ Añadir al plato</button>
+      </div>
+    </div>
+  </div></div><div style="margin-bottom:24px"><div class="section-title">🥪 Snacks y bocadillos</div><div class="dishes-grid">
+    <div class="dish-card" id="dc-d60">
+      <div class="dish-header">
+        <span class="dish-emoji">🥪</span>
+        <div class="dish-info">
+          <div class="dish-name">Bocadillo de jamón</div>
+          <div class="dish-desc">Bocadillo con pan de barra</div>
+        </div>
+        <div class="dish-hc-badge">45g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pan blanco (barra) (90g)<span>45g HC</span></li><li>Jamón (sin HC) (40g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d60">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d61">
+      <div class="dish-header">
+        <span class="dish-emoji">🥪</span>
+        <div class="dish-info">
+          <div class="dish-name">Bocadillo de atún</div>
+          <div class="dish-desc">Con tomate y atún</div>
+        </div>
+        <div class="dish-hc-badge">47g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pan blanco (barra) (90g)<span>45g HC</span></li><li>Tomate (30g)<span>1g HC</span></li><li>Atún (sin HC) (40g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d61">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d62">
+      <div class="dish-header">
+        <span class="dish-emoji">🥐</span>
+        <div class="dish-info">
+          <div class="dish-name">Croissant + zumo</div>
+          <div class="dish-desc">Desayuno o merienda</div>
+        </div>
+        <div class="dish-hc-badge">56g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Cruasán (60g)<span>28g HC</span></li><li>Zumo naranja natural (200g)<span>18g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d62">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d63">
+      <div class="dish-header">
+        <span class="dish-emoji">🍌</span>
+        <div class="dish-info">
+          <div class="dish-name">Plátano + yogur</div>
+          <div class="dish-desc">Snack saludable</div>
+        </div>
+        <div class="dish-hc-badge">28g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Plátano (100g)<span>20g HC</span></li><li>Yogur natural (125g)<span>6g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d63">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d64">
+      <div class="dish-header">
+        <span class="dish-emoji">🍞</span>
+        <div class="dish-info">
+          <div class="dish-name">Pan con tomate</div>
+          <div class="dish-desc">Rebanada de pan con tomate rallado</div>
+        </div>
+        <div class="dish-hc-badge">26g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pan de molde x2 (50g)<span>25g HC</span></li><li>Tomate (30g)<span>1g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d64">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d65">
+      <div class="dish-header">
+        <span class="dish-emoji">🧀</span>
+        <div class="dish-info">
+          <div class="dish-name">Montadito de queso</div>
+          <div class="dish-desc">Pan tostado con queso fresco</div>
+        </div>
+        <div class="dish-hc-badge">14g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Pan tostado (15g)<span>10g HC</span></li><li>Queso fresco (sin HC) (50g)<span>0g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d65">➕ Añadir al plato</button>
+      </div>
+    </div>
+  
+    <div class="dish-card" id="dc-d66">
+      <div class="dish-header">
+        <span class="dish-emoji">🍪</span>
+        <div class="dish-info">
+          <div class="dish-name">Galletas con leche (merienda)</div>
+          <div class="dish-desc">5 galletas María con vaso leche</div>
+        </div>
+        <div class="dish-hc-badge">44g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients"><li>Galletas María x5 (35g)<span>26g HC</span></li><li>Leche (200g)<span>10g HC</span></li></ul>
+        <button class="dish-add-btn" data-id="d66">➕ Añadir al plato</button>
+      </div>
+    </div>
+  </div></div></div>
+    </div>
+    <div class="col-plate" id="plate-col-1">
+  <div class="plate-title">🍽️ Mi plato</div>
+  <div class="plate-sub">Pulsa para añadir alimentos</div>
+  <div id="plate-empty" class="plate-empty-msg" style="display: flex;">
+    <div class="e-icon">🥗</div>
+    <p>Aquí aparecen los alimentos que añadas</p>
+  </div>
+  <div id="plate-list" class="plate-list" style="display:none"></div>
+  <div id="total-card" class="total-card" style="display:none">
+    <div class="tc-label">Total hidratos</div>
+    <div><span id="tc-num" class="tc-num">0</span> <span class="tc-unit">g HC</span></div>
+    <div id="tc-rac" class="tc-rac">0 raciones</div>
+  </div>
+  <button id="clear-btn" class="clear-btn" style="display:none" onclick="clearPlate()">🗑 Vaciar plato</button>
+  <div class="disclaimer-txt">⚠️ Estimación orientativa. Consulta siempre con tu médico antes de ajustar el tratamiento.</div>
+  <button class="install-toggle" onclick="toggleInstall()">📲 Guardar como app en el móvil ▾</button>
+  <div class="install-body" id="install-body">
+    <div class="install-os"><strong>🍎 iPhone (Safari)</strong><ol><li>Abre en Safari</li><li>Pulsa compartir ⬆</li><li>«Añadir a pantalla de inicio»</li><li>Pulsa «Añadir»</li></ol></div>
+    <div class="install-os"><strong>🤖 Android (Chrome)</strong><ol><li>Abre en Chrome</li><li>Pulsa los tres puntos ⋮</li><li>«Añadir a pantalla de inicio»</li><li>Pulsa «Añadir»</li></ol></div>
+  </div>
+</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL 2: INGREDIENTES -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="panel" id="panel-ingredientes">
+  <div class="split-layout">
+    <div class="col-main">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="ing-search" placeholder="Buscar alimento... ej: arroz, manzana, pan...">
+      </div>
+      <div class="cat-bar" id="ing-cats">
+        <button class="cat-btn active" data-cat="all">Todos</button>
+        <button class="cat-btn" data-cat="lacteos">🥛 Lácteos</button>
+        <button class="cat-btn" data-cat="cereales">🌾 Cereales</button>
+        <button class="cat-btn" data-cat="frutas">🍎 Frutas</button>
+        <button class="cat-btn" data-cat="hortalizas">🥦 Hortalizas</button>
+        <button class="cat-btn" data-cat="frutos">🥜 Frutos secos</button>
+        <button class="cat-btn" data-cat="bebidas">🥤 Bebidas</button>
+        <button class="cat-btn" data-cat="otros">🍕 Otros</button>
+      </div>
+      <div id="ing-list"><div style="margin-bottom:24px"><div class="section-title">🥛 Lácteos</div><div class="food-grid"><div class="food-item"><span class="food-name">Leche (cualquier tipo)</span><div class="food-portions"><button class="portion-btn" data-food="1" data-pi="0">Vaso 200ml · 10g HC</button><button class="portion-btn" data-food="1" data-pi="1">Taza 150ml · 7g HC</button></div></div><div class="food-item"><span class="food-name">Yogur natural</span><div class="food-portions"><button class="portion-btn" data-food="2" data-pi="0">Unidad 125g · 6g HC</button><button class="portion-btn" data-food="2" data-pi="1">Unidad grande 200g · 9g HC</button></div></div><div class="food-item"><span class="food-name">Yogur sabores/fruta</span><div class="food-portions"><button class="portion-btn" data-food="3" data-pi="0">Unidad 125g · 15g HC</button></div></div><div class="food-item"><span class="food-name">Natillas</span><div class="food-portions"><button class="portion-btn" data-food="4" data-pi="0">Tarrina 125ml · 23g HC</button></div></div><div class="food-item"><span class="food-name">Flan</span><div class="food-portions"><button class="portion-btn" data-food="5" data-pi="0">Unidad 110g · 22g HC</button></div></div><div class="food-item"><span class="food-name">Helado de crema</span><div class="food-portions"><button class="portion-btn" data-food="6" data-pi="0">Bola 100g · 22g HC</button><button class="portion-btn" data-food="6" data-pi="1">Tarrina 150ml · 33g HC</button></div></div><div class="food-item"><span class="food-name">Helado de hielo</span><div class="food-portions"><button class="portion-btn" data-food="7" data-pi="0">Unidad 100ml · 22g HC</button></div></div><div class="food-item"><span class="food-name">Queso fresco</span><div class="food-portions"><button class="portion-btn" data-food="8" data-pi="0">Porción 70g · 2g HC</button></div></div><div class="food-item"><span class="food-name">Leche condensada</span><div class="food-portions"><button class="portion-btn" data-food="9" data-pi="0">Cucharada 20g · 11g HC</button></div></div><div class="food-item"><span class="food-name">Kéfir</span><div class="food-portions"><button class="portion-btn" data-food="10" data-pi="0">Unidad 125ml · 5g HC</button></div></div></div></div><div style="margin-bottom:24px"><div class="section-title">🌾 Cereales, pan, pasta y tubérculos</div><div class="food-grid"><div class="food-item"><span class="food-name">Arroz blanco hervido</span><div class="food-portions"><button class="portion-btn" data-food="11" data-pi="0">Guarnición 80g · 21g HC</button><button class="portion-btn" data-food="11" data-pi="1">Plato mediano 160g · 42g HC</button><button class="portion-btn" data-food="11" data-pi="2">Plato grande 240g · 62g HC</button></div></div><div class="food-item"><span class="food-name">Arroz integral hervido</span><div class="food-portions"><button class="portion-btn" data-food="12" data-pi="0">Guarnición 80g · 20g HC</button><button class="portion-btn" data-food="12" data-pi="1">Plato mediano 160g · 40g HC</button></div></div><div class="food-item"><span class="food-name">Pasta hervida</span><div class="food-portions"><button class="portion-btn" data-food="13" data-pi="0">Guarnición 90g · 23g HC</button><button class="portion-btn" data-food="13" data-pi="1">Plato mediano 180g · 45g HC</button><button class="portion-btn" data-food="13" data-pi="2">Plato grande 270g · 68g HC</button></div></div><div class="food-item"><span class="food-name">Pasta integral hervida</span><div class="food-portions"><button class="portion-btn" data-food="14" data-pi="0">Guarnición 90g · 20g HC</button><button class="portion-btn" data-food="14" data-pi="1">Plato mediano 180g · 40g HC</button></div></div><div class="food-item"><span class="food-name">Pan blanco</span><div class="food-portions"><button class="portion-btn" data-food="15" data-pi="0">Rebanada 25g · 13g HC</button><button class="portion-btn" data-food="15" data-pi="1">Panecillo 60g · 30g HC</button><button class="portion-btn" data-food="15" data-pi="2">Barra ¼ 45g · 23g HC</button></div></div><div class="food-item"><span class="food-name">Pan integral</span><div class="food-portions"><button class="portion-btn" data-food="16" data-pi="0">Rebanada 25g · 11g HC</button><button class="portion-btn" data-food="16" data-pi="1">Panecillo 60g · 26g HC</button></div></div><div class="food-item"><span class="food-name">Pan de molde</span><div class="food-portions"><button class="portion-btn" data-food="17" data-pi="0">Rebanada 25g · 13g HC</button><button class="portion-btn" data-food="17" data-pi="1">2 rebanadas 50g · 25g HC</button></div></div><div class="food-item"><span class="food-name">Pan tostado / biscote</span><div class="food-portions"><button class="portion-btn" data-food="18" data-pi="0">Unidad 12g · 8g HC</button><button class="portion-btn" data-food="18" data-pi="1">2 unidades 24g · 16g HC</button></div></div><div class="food-item"><span class="food-name">Patata hervida</span><div class="food-portions"><button class="portion-btn" data-food="19" data-pi="0">Guarnición 100g · 15g HC</button><button class="portion-btn" data-food="19" data-pi="1">Plato mediano 200g · 30g HC</button><button class="portion-btn" data-food="19" data-pi="2">Plato grande 300g · 45g HC</button></div></div><div class="food-item"><span class="food-name">Patata al horno</span><div class="food-portions"><button class="portion-btn" data-food="20" data-pi="0">Guarnición 60g · 17g HC</button><button class="portion-btn" data-food="20" data-pi="1">Ración 150g · 44g HC</button></div></div><div class="food-item"><span class="food-name">Patatas fritas caseras</span><div class="food-portions"><button class="portion-btn" data-food="21" data-pi="0">Ración 100g · 33g HC</button></div></div><div class="food-item"><span class="food-name">Patatas chips</span><div class="food-portions"><button class="portion-btn" data-food="22" data-pi="0">Bolsa pequeña 30g · 15g HC</button></div></div><div class="food-item"><span class="food-name">Puré de patatas</span><div class="food-portions"><button class="portion-btn" data-food="23" data-pi="0">Ración 200g · 22g HC</button></div></div><div class="food-item"><span class="food-name">Lentejas hervidas</span><div class="food-portions"><button class="portion-btn" data-food="24" data-pi="0">Guarnición 100g · 20g HC</button><button class="portion-btn" data-food="24" data-pi="1">Plato mediano 200g · 40g HC</button><button class="portion-btn" data-food="24" data-pi="2">Plato grande 300g · 60g HC</button></div></div><div class="food-item"><span class="food-name">Garbanzos hervidos</span><div class="food-portions"><button class="portion-btn" data-food="25" data-pi="0">Guarnición 100g · 18g HC</button><button class="portion-btn" data-food="25" data-pi="1">Plato mediano 200g · 36g HC</button></div></div><div class="food-item"><span class="food-name">Judías blancas hervidas</span><div class="food-portions"><button class="portion-btn" data-food="26" data-pi="0">Guarnición 100g · 18g HC</button><button class="portion-btn" data-food="26" data-pi="1">Plato mediano 200g · 36g HC</button></div></div><div class="food-item"><span class="food-name">Quinoa hervida</span><div class="food-portions"><button class="portion-btn" data-food="27" data-pi="0">Guarnición 100g · 21g HC</button><button class="portion-btn" data-food="27" data-pi="1">Ración 200g · 42g HC</button></div></div><div class="food-item"><span class="food-name">Cuscús cocido</span><div class="food-portions"><button class="portion-btn" data-food="28" data-pi="0">Guarnición 100g · 22g HC</button></div></div><div class="food-item"><span class="food-name">Avena (copos)</span><div class="food-portions"><button class="portion-btn" data-food="29" data-pi="0">Ración 40g · 24g HC</button><button class="portion-btn" data-food="29" data-pi="1">Ración grande 60g · 35g HC</button></div></div><div class="food-item"><span class="food-name">Cereales desayuno</span><div class="food-portions"><button class="portion-btn" data-food="30" data-pi="0">Ración 30g · 20g HC</button><button class="portion-btn" data-food="30" data-pi="1">Ración grande 50g · 34g HC</button></div></div><div class="food-item"><span class="food-name">Boniato hervido</span><div class="food-portions"><button class="portion-btn" data-food="31" data-pi="0">Unidad mediana 150g · 30g HC</button></div></div><div class="food-item"><span class="food-name">Maíz en lata</span><div class="food-portions"><button class="portion-btn" data-food="32" data-pi="0">Ración 80g · 11g HC</button></div></div><div class="food-item"><span class="food-name">Guisantes</span><div class="food-portions"><button class="portion-btn" data-food="33" data-pi="0">Guarnición 100g · 9g HC</button><button class="portion-btn" data-food="33" data-pi="1">Plato mediano 200g · 18g HC</button></div></div><div class="food-item"><span class="food-name">Galleta tipo María</span><div class="food-portions"><button class="portion-btn" data-food="34" data-pi="0">1 galleta 7g · 5g HC</button><button class="portion-btn" data-food="34" data-pi="1">3 galletas 21g · 16g HC</button><button class="portion-btn" data-food="34" data-pi="2">5 galletas 35g · 26g HC</button></div></div><div class="food-item"><span class="food-name">Galleta Digestive</span><div class="food-portions"><button class="portion-btn" data-food="35" data-pi="0">1 galleta 11g · 7g HC</button><button class="portion-btn" data-food="35" data-pi="1">3 galletas 33g · 21g HC</button></div></div><div class="food-item"><span class="food-name">Pizza</span><div class="food-portions"><button class="portion-btn" data-food="36" data-pi="0">Triángulo 100g · 25g HC</button><button class="portion-btn" data-food="36" data-pi="1">Media pizza 200g · 50g HC</button></div></div><div class="food-item"><span class="food-name">Sushi (porción)</span><div class="food-portions"><button class="portion-btn" data-food="37" data-pi="0">Pieza 20g · 4g HC</button><button class="portion-btn" data-food="37" data-pi="1">6 piezas 150g · 33g HC</button></div></div></div></div><div style="margin-bottom:24px"><div class="section-title">🍎 Frutas</div><div class="food-grid"><div class="food-item"><span class="food-name">Manzana</span><div class="food-portions"><button class="portion-btn" data-food="40" data-pi="0">Unidad mediana 200g · 24g HC</button></div></div><div class="food-item"><span class="food-name">Pera</span><div class="food-portions"><button class="portion-btn" data-food="41" data-pi="0">Unidad mediana 200g · 24g HC</button></div></div><div class="food-item"><span class="food-name">Naranja</span><div class="food-portions"><button class="portion-btn" data-food="42" data-pi="0">Unidad mediana 200g · 18g HC</button></div></div><div class="food-item"><span class="food-name">Plátano</span><div class="food-portions"><button class="portion-btn" data-food="43" data-pi="0">Unidad pequeña 100g · 20g HC</button><button class="portion-btn" data-food="43" data-pi="1">Unidad mediana 150g · 30g HC</button></div></div><div class="food-item"><span class="food-name">Mandarina</span><div class="food-portions"><button class="portion-btn" data-food="44" data-pi="0">Unidad 100g · 10g HC</button></div></div><div class="food-item"><span class="food-name">Uva</span><div class="food-portions"><button class="portion-btn" data-food="45" data-pi="0">12 unidades 100g · 17g HC</button></div></div><div class="food-item"><span class="food-name">Sandía</span><div class="food-portions"><button class="portion-btn" data-food="46" data-pi="0">Tajada 200g · 10g HC</button></div></div><div class="food-item"><span class="food-name">Melón</span><div class="food-portions"><button class="portion-btn" data-food="47" data-pi="0">Tajada 200g · 10g HC</button></div></div><div class="food-item"><span class="food-name">Melocotón</span><div class="food-portions"><button class="portion-btn" data-food="48" data-pi="0">Unidad mediana 200g · 20g HC</button></div></div><div class="food-item"><span class="food-name">Fresas</span><div class="food-portions"><button class="portion-btn" data-food="49" data-pi="0">8 unidades 200g · 12g HC</button></div></div><div class="food-item"><span class="food-name">Kiwi</span><div class="food-portions"><button class="portion-btn" data-food="50" data-pi="0">Unidad 100g · 10g HC</button></div></div><div class="food-item"><span class="food-name">Mango</span><div class="food-portions"><button class="portion-btn" data-food="51" data-pi="0">Unidad mediana 200g · 30g HC</button></div></div><div class="food-item"><span class="food-name">Piña</span><div class="food-portions"><button class="portion-btn" data-food="52" data-pi="0">2 rodajas 100g · 10g HC</button></div></div><div class="food-item"><span class="food-name">Cereza</span><div class="food-portions"><button class="portion-btn" data-food="53" data-pi="0">12 unidades 100g · 13g HC</button></div></div><div class="food-item"><span class="food-name">Ciruela</span><div class="food-portions"><button class="portion-btn" data-food="54" data-pi="0">2 unidades 100g · 11g HC</button></div></div><div class="food-item"><span class="food-name">Higos frescos</span><div class="food-portions"><button class="portion-btn" data-food="55" data-pi="0">2 unidades 100g · 16g HC</button></div></div><div class="food-item"><span class="food-name">Caqui</span><div class="food-portions"><button class="portion-btn" data-food="56" data-pi="0">Unidad mediana 150g · 23g HC</button></div></div></div></div><div style="margin-bottom:24px"><div class="section-title">🥦 Hortalizas</div><div class="food-grid"><div class="food-item"><span class="food-name">Tomate</span><div class="food-portions"><button class="portion-btn" data-food="60" data-pi="0">Unidad mediana 150g · 5g HC</button></div></div><div class="food-item"><span class="food-name">Zanahoria</span><div class="food-portions"><button class="portion-btn" data-food="61" data-pi="0">Unidad mediana 70g · 5g HC</button><button class="portion-btn" data-food="61" data-pi="1">Guarnición 150g · 11g HC</button></div></div><div class="food-item"><span class="food-name">Cebolla</span><div class="food-portions"><button class="portion-btn" data-food="62" data-pi="0">Unidad mediana 150g · 12g HC</button><button class="portion-btn" data-food="62" data-pi="1">Cucharada 20g · 2g HC</button></div></div><div class="food-item"><span class="food-name">Pimiento</span><div class="food-portions"><button class="portion-btn" data-food="63" data-pi="0">Unidad mediana 150g · 8g HC</button></div></div><div class="food-item"><span class="food-name">Calabacín</span><div class="food-portions"><button class="portion-btn" data-food="64" data-pi="0">Ración 200g · 6g HC</button></div></div><div class="food-item"><span class="food-name">Berenjena</span><div class="food-portions"><button class="portion-btn" data-food="65" data-pi="0">Ración 200g · 6g HC</button></div></div><div class="food-item"><span class="food-name">Brócoli</span><div class="food-portions"><button class="portion-btn" data-food="66" data-pi="0">Plato 300g · 9g HC</button></div></div><div class="food-item"><span class="food-name">Espinacas</span><div class="food-portions"><button class="portion-btn" data-food="67" data-pi="0">Plato 200g · 2g HC</button></div></div><div class="food-item"><span class="food-name">Lechuga</span><div class="food-portions"><button class="portion-btn" data-food="68" data-pi="0">Ración 70g · 1g HC</button><button class="portion-btn" data-food="68" data-pi="1">Plato 150g · 3g HC</button></div></div><div class="food-item"><span class="food-name">Remolacha</span><div class="food-portions"><button class="portion-btn" data-food="69" data-pi="0">Unidad 150g · 11g HC</button></div></div><div class="food-item"><span class="food-name">Pepino</span><div class="food-portions"><button class="portion-btn" data-food="70" data-pi="0">Unidad 200g · 4g HC</button></div></div><div class="food-item"><span class="food-name">Judías verdes</span><div class="food-portions"><button class="portion-btn" data-food="71" data-pi="0">Plato 250g · 10g HC</button></div></div></div></div><div style="margin-bottom:24px"><div class="section-title">🥜 Frutos secos</div><div class="food-grid"><div class="food-item"><span class="food-name">Almendras</span><div class="food-portions"><button class="portion-btn" data-food="80" data-pi="0">Puñado 20g · 1g HC</button></div></div><div class="food-item"><span class="food-name">Nueces</span><div class="food-portions"><button class="portion-btn" data-food="81" data-pi="0">Puñado 20g · 1g HC</button></div></div><div class="food-item"><span class="food-name">Cacahuetes</span><div class="food-portions"><button class="portion-btn" data-food="82" data-pi="0">Puñado 20g · 2g HC</button></div></div><div class="food-item"><span class="food-name">Pistachos</span><div class="food-portions"><button class="portion-btn" data-food="83" data-pi="0">Puñado 20g · 3g HC</button></div></div><div class="food-item"><span class="food-name">Uvas pasas</span><div class="food-portions"><button class="portion-btn" data-food="84" data-pi="0">Puñado 20g · 13g HC</button></div></div><div class="food-item"><span class="food-name">Dátiles secos</span><div class="food-portions"><button class="portion-btn" data-food="85" data-pi="0">1 unidad 12g · 8g HC</button><button class="portion-btn" data-food="85" data-pi="1">3 unidades 36g · 25g HC</button></div></div><div class="food-item"><span class="food-name">Higos secos</span><div class="food-portions"><button class="portion-btn" data-food="86" data-pi="0">1 unidad 15g · 10g HC</button></div></div><div class="food-item"><span class="food-name">Castañas tostadas</span><div class="food-portions"><button class="portion-btn" data-food="87" data-pi="0">5 unidades 50g · 20g HC</button></div></div></div></div><div style="margin-bottom:24px"><div class="section-title">🥤 Bebidas</div><div class="food-grid"><div class="food-item"><span class="food-name">Zumo de naranja natural</span><div class="food-portions"><button class="portion-btn" data-food="90" data-pi="0">Vaso 200ml · 18g HC</button></div></div><div class="food-item"><span class="food-name">Zumo comercial (brick)</span><div class="food-portions"><button class="portion-btn" data-food="91" data-pi="0">Brick 200ml · 20g HC</button></div></div><div class="food-item"><span class="food-name">Bebida refrescante cola</span><div class="food-portions"><button class="portion-btn" data-food="92" data-pi="0">Vaso 200ml · 20g HC</button><button class="portion-btn" data-food="92" data-pi="1">Lata 330ml · 33g HC</button></div></div><div class="food-item"><span class="food-name">Bebida light / sin azúcar</span><div class="food-portions"><button class="portion-btn" data-food="93" data-pi="0">Cualquier cantidad · 0g HC</button></div></div><div class="food-item"><span class="food-name">Cerveza</span><div class="food-portions"><button class="portion-btn" data-food="94" data-pi="0">Caña 200ml · 6g HC</button><button class="portion-btn" data-food="94" data-pi="1">Tercio 330ml · 10g HC</button></div></div><div class="food-item"><span class="food-name">Horchata</span><div class="food-portions"><button class="portion-btn" data-food="95" data-pi="0">Vaso 200ml · 34g HC</button></div></div><div class="food-item"><span class="food-name">Leche de avena</span><div class="food-portions"><button class="portion-btn" data-food="96" data-pi="0">Vaso 200ml · 12g HC</button></div></div><div class="food-item"><span class="food-name">Leche de almendra</span><div class="food-portions"><button class="portion-btn" data-food="97" data-pi="0">Vaso 200ml · 6g HC</button></div></div></div></div><div style="margin-bottom:24px"><div class="section-title">🍕 Otros</div><div class="food-grid"><div class="food-item"><span class="food-name">Azúcar</span><div class="food-portions"><button class="portion-btn" data-food="100" data-pi="0">Sobre 8g · 8g HC</button><button class="portion-btn" data-food="100" data-pi="1">Cucharada 20g · 20g HC</button></div></div><div class="food-item"><span class="food-name">Miel</span><div class="food-portions"><button class="portion-btn" data-food="101" data-pi="0">Cucharada 18g · 14g HC</button></div></div><div class="food-item"><span class="food-name">Mermelada normal</span><div class="food-portions"><button class="portion-btn" data-food="102" data-pi="0">Cucharada 25g · 14g HC</button></div></div><div class="food-item"><span class="food-name">Mermelada light</span><div class="food-portions"><button class="portion-btn" data-food="103" data-pi="0">Cucharada 25g · 7g HC</button></div></div><div class="food-item"><span class="food-name">Chocolate con leche</span><div class="food-portions"><button class="portion-btn" data-food="104" data-pi="0">Onza 10g · 6g HC</button><button class="portion-btn" data-food="104" data-pi="1">3 onzas 30g · 17g HC</button></div></div><div class="food-item"><span class="food-name">Chocolate negro &gt;70%</span><div class="food-portions"><button class="portion-btn" data-food="105" data-pi="0">Onza 10g · 4g HC</button><button class="portion-btn" data-food="105" data-pi="1">3 onzas 30g · 12g HC</button></div></div><div class="food-item"><span class="food-name">Croquetas</span><div class="food-portions"><button class="portion-btn" data-food="106" data-pi="0">3 unidades 90g · 18g HC</button></div></div><div class="food-item"><span class="food-name">Tortilla de patatas</span><div class="food-portions"><button class="portion-btn" data-food="107" data-pi="0">Tapa 100g · 12g HC</button><button class="portion-btn" data-food="107" data-pi="1">Ración 200g · 24g HC</button></div></div><div class="food-item"><span class="food-name">Magdalena</span><div class="food-portions"><button class="portion-btn" data-food="108" data-pi="0">Unidad 50g · 26g HC</button></div></div><div class="food-item"><span class="food-name">Cruasán</span><div class="food-portions"><button class="portion-btn" data-food="109" data-pi="0">Unidad 60g · 28g HC</button></div></div><div class="food-item"><span class="food-name">Churros</span><div class="food-portions"><button class="portion-btn" data-food="110" data-pi="0">2 unidades 25g · 10g HC</button><button class="portion-btn" data-food="110" data-pi="1">Ración 100g · 40g HC</button></div></div><div class="food-item"><span class="food-name">Ketchup</span><div class="food-portions"><button class="portion-btn" data-food="111" data-pi="0">Cucharada 20g · 4g HC</button></div></div><div class="food-item"><span class="food-name">Salsa de tomate</span><div class="food-portions"><button class="portion-btn" data-food="112" data-pi="0">3 cucharadas 50g · 4g HC</button></div></div><div class="food-item"><span class="food-name">Hummus</span><div class="food-portions"><button class="portion-btn" data-food="113" data-pi="0">Ración 100g · 10g HC</button></div></div><div class="food-item"><span class="food-name">Pizza</span><div class="food-portions"><button class="portion-btn" data-food="114" data-pi="0">Triángulo 100g · 25g HC</button><button class="portion-btn" data-food="114" data-pi="1">Media pizza 200g · 50g HC</button></div></div><div class="food-item"><span class="food-name">Turrón Alicante/Jijona</span><div class="food-portions"><button class="portion-btn" data-food="115" data-pi="0">1/6 tableta 50g · 28g HC</button></div></div><div class="food-item"><span class="food-name">Palomitas</span><div class="food-portions"><button class="portion-btn" data-food="116" data-pi="0">Ración 20g · 10g HC</button></div></div></div></div></div>
+    </div>
+    <div class="col-plate" id="plate-col-2">
+  <div class="plate-title">🍽️ Mi plato</div>
+  <div class="plate-sub">Pulsa para añadir alimentos</div>
+  <div id="plate-empty" class="plate-empty-msg" style="display: flex;">
+    <div class="e-icon">🥗</div>
+    <p>Aquí aparecen los alimentos que añadas</p>
+  </div>
+  <div id="plate-list" class="plate-list" style="display:none"></div>
+  <div id="total-card" class="total-card" style="display:none">
+    <div class="tc-label">Total hidratos</div>
+    <div><span id="tc-num" class="tc-num">0</span> <span class="tc-unit">g HC</span></div>
+    <div id="tc-rac" class="tc-rac">0 raciones</div>
+  </div>
+  <button id="clear-btn" class="clear-btn" style="display:none" onclick="clearPlate()">🗑 Vaciar plato</button>
+  <div class="disclaimer-txt">⚠️ Estimación orientativa. Consulta siempre con tu médico antes de ajustar el tratamiento.</div>
+  <button class="install-toggle" onclick="toggleInstall()">📲 Guardar como app en el móvil ▾</button>
+  <div class="install-body" id="install-body">
+    <div class="install-os"><strong>🍎 iPhone (Safari)</strong><ol><li>Abre en Safari</li><li>Pulsa compartir ⬆</li><li>«Añadir a pantalla de inicio»</li><li>Pulsa «Añadir»</li></ol></div>
+    <div class="install-os"><strong>🤖 Android (Chrome)</strong><ol><li>Abre en Chrome</li><li>Pulsa los tres puntos ⋮</li><li>«Añadir a pantalla de inicio»</li><li>Pulsa «Añadir»</li></ol></div>
+  </div>
+</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL 3: MIS PLATOS -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="panel" id="panel-misplatos">
+  <div class="split-layout">
+    <div class="col-main">
+      <div class="mis-platos-intro">
+        <strong>💾 Tus platos guardados</strong>
+        Añade aquí los platos que comes habitualmente. Se guardan en tu móvil y no desaparecen aunque cierres la app.
+      </div>
+
+      <!-- FORMULARIO NUEVO PLATO -->
+      <div class="new-dish-form">
+        <label class="form-label">Nombre del plato</label>
+        <input class="form-input" id="new-name" placeholder="Ej: Macarrones de los martes">
+        <label class="form-label">Descripción (opcional)</label>
+        <input class="form-input" id="new-desc" placeholder="Ej: Con tomate, atún y aceitunas">
+        <div class="form-row">
+          <div style="flex:1">
+            <label class="form-label">Hidratos totales (g)</label>
+            <input class="form-input" id="new-hc" type="number" min="0" max="500" placeholder="Ej: 55">
+          </div>
+          <div style="flex:1">
+            <label class="form-label">Ración habitual</label>
+            <input class="form-input" id="new-portion" placeholder="Ej: 1 plato mediano">
+          </div>
+        </div>
+        <button class="save-dish-btn" onclick="saveCustomDish()">💾 Guardar plato</button>
+      </div>
+
+      <div class="section-title">Mis platos guardados</div>
+      <div id="custom-dishes-list"><div class="empty-custom">✨ Aún no tienes platos guardados.<br>Añade tus comidas habituales arriba<br>y aparecerán aquí para siempre.</div></div>
+    </div>
+    <div class="col-plate" id="plate-col-3">
+  <div class="plate-title">🍽️ Mi plato</div>
+  <div class="plate-sub">Pulsa para añadir alimentos</div>
+  <div id="plate-empty" class="plate-empty-msg" style="display: flex;">
+    <div class="e-icon">🥗</div>
+    <p>Aquí aparecen los alimentos que añadas</p>
+  </div>
+  <div id="plate-list" class="plate-list" style="display:none"></div>
+  <div id="total-card" class="total-card" style="display:none">
+    <div class="tc-label">Total hidratos</div>
+    <div><span id="tc-num" class="tc-num">0</span> <span class="tc-unit">g HC</span></div>
+    <div id="tc-rac" class="tc-rac">0 raciones</div>
+  </div>
+  <button id="clear-btn" class="clear-btn" style="display:none" onclick="clearPlate()">🗑 Vaciar plato</button>
+  <div class="disclaimer-txt">⚠️ Estimación orientativa. Consulta siempre con tu médico antes de ajustar el tratamiento.</div>
+  <button class="install-toggle" onclick="toggleInstall()">📲 Guardar como app en el móvil ▾</button>
+  <div class="install-body" id="install-body">
+    <div class="install-os"><strong>🍎 iPhone (Safari)</strong><ol><li>Abre en Safari</li><li>Pulsa compartir ⬆</li><li>«Añadir a pantalla de inicio»</li><li>Pulsa «Añadir»</li></ol></div>
+    <div class="install-os"><strong>🤖 Android (Chrome)</strong><ol><li>Abre en Chrome</li><li>Pulsa los tres puntos ⋮</li><li>«Añadir a pantalla de inicio»</li><li>Pulsa «Añadir»</li></ol></div>
+  </div>
+</div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// DATOS: PLATOS TÍPICOS
+// ══════════════════════════════════════════════════════
+const DISHES = [
+  // PRIMEROS
+  { id:'d1', cat:'primeros', emoji:'🍲', name:'Lentejas estofadas', desc:'Lentejas, zanahoria, patata, chorizo', hc:45,
+    ingredients:[{n:'Lentejas hervidas',g:200,hc:40},{n:'Patata hervida',g:50,hc:8},{n:'Zanahoria',g:30,hc:2},{n:'Chorizo (sin HC)',g:30,hc:0}]},
+  { id:'d2', cat:'primeros', emoji:'🫘', name:'Cocido madrileño', desc:'Garbanzos, fideos, patata, verduras', hc:55,
+    ingredients:[{n:'Garbanzos hervidos',g:150,hc:27},{n:'Fideos/pasta hervida',g:80,hc:20},{n:'Patata hervida',g:60,hc:9},{n:'Verduras (sin HC)',g:100,hc:0}]},
+  { id:'d3', cat:'primeros', emoji:'🍚', name:'Arroz blanco', desc:'Plato mediano de arroz hervido', hc:40,
+    ingredients:[{n:'Arroz blanco hervido',g:160,hc:40}]},
+  { id:'d4', cat:'primeros', emoji:'🥘', name:'Paella', desc:'Arroz, guisantes, verduras', hc:50,
+    ingredients:[{n:'Arroz blanco hervido',g:160,hc:40},{n:'Guisantes',g:50,hc:5},{n:'Pimiento',g:30,hc:2},{n:'Tomate',g:30,hc:1}]},
+  { id:'d5', cat:'primeros', emoji:'🍝', name:'Macarrones con tomate', desc:'Pasta con salsa de tomate', hc:52,
+    ingredients:[{n:'Pasta hervida',g:180,hc:45},{n:'Salsa de tomate',g:100,hc:8}]},
+  { id:'d6', cat:'primeros', emoji:'🍜', name:'Espaguetis boloñesa', desc:'Pasta con carne y tomate', hc:50,
+    ingredients:[{n:'Pasta hervida',g:180,hc:45},{n:'Salsa boloñesa',g:150,hc:5}]},
+  { id:'d7', cat:'primeros', emoji:'🥣', name:'Crema de verduras', desc:'Zanahoria, calabacín, patata', hc:18,
+    ingredients:[{n:'Patata hervida',g:80,hc:12},{n:'Zanahoria',g:70,hc:5},{n:'Calabacín',g:100,hc:3}]},
+  { id:'d8', cat:'primeros', emoji:'🥗', name:'Sopa de fideos', desc:'Caldo con fideos y verdura', hc:18,
+    ingredients:[{n:'Fideos/pasta hervida',g:60,hc:15},{n:'Zanahoria',g:30,hc:2},{n:'Caldo (sin HC)',g:200,hc:0}]},
+  { id:'d9', cat:'primeros', emoji:'🫕', name:'Judías blancas con chorizo', desc:'Alubias estofadas', hc:36,
+    ingredients:[{n:'Judías blancas hervidas',g:200,hc:36},{n:'Chorizo (sin HC)',g:30,hc:0}]},
+  { id:'d10', cat:'primeros', emoji:'🥘', name:'Fabada asturiana', desc:'Fabes, chorizo, morcilla', hc:40,
+    ingredients:[{n:'Judías blancas hervidas',g:200,hc:36},{n:'Chorizo y embutido',g:50,hc:2},{n:'Caldo',g:100,hc:0}]},
+  { id:'d11', cat:'primeros', emoji:'🍲', name:'Puchero andaluz', desc:'Garbanzos, patata, verduras', hc:50,
+    ingredients:[{n:'Garbanzos hervidos',g:150,hc:27},{n:'Patata hervida',g:100,hc:15},{n:'Verduras',g:100,hc:5}]},
+  { id:'d12', cat:'primeros', emoji:'🍚', name:'Arroz con leche', desc:'Postre de arroz con leche y azúcar', hc:42,
+    ingredients:[{n:'Arroz blanco hervido',g:80,hc:20},{n:'Leche',g:200,hc:10},{n:'Azúcar',g:20,hc:20}]},
+  { id:'d13', cat:'primeros', emoji:'🥦', name:'Menestra de verduras', desc:'Verduras variadas estofadas', hc:18,
+    ingredients:[{n:'Guisantes',g:100,hc:9},{n:'Zanahoria',g:80,hc:6},{n:'Judías verdes',g:100,hc:4}]},
+  { id:'d14', cat:'primeros', emoji:'🍲', name:'Potaje de garbanzos con espinacas', desc:'Garbanzos, espinacas, tomate', hc:30,
+    ingredients:[{n:'Garbanzos hervidos',g:150,hc:27},{n:'Espinacas (sin HC)',g:100,hc:1},{n:'Tomate',g:50,hc:2}]},
+
+  // SEGUNDOS
+  { id:'d20', cat:'segundos', emoji:'🥚', name:'Tortilla de patatas', desc:'Huevo y patata frita', hc:24,
+    ingredients:[{n:'Patata frita',g:120,hc:20},{n:'Huevo (sin HC)',g:100,hc:0},{n:'Cebolla',g:30,hc:2}]},
+  { id:'d21', cat:'segundos', emoji:'🍗', name:'Pollo a la plancha con arroz', desc:'Pechuga y guarnición de arroz', hc:40,
+    ingredients:[{n:'Arroz blanco hervido',g:160,hc:40},{n:'Pollo a la plancha (sin HC)',g:150,hc:0}]},
+  { id:'d22', cat:'segundos', emoji:'🐟', name:'Merluza con patatas', desc:'Merluza al horno con patata asada', hc:18,
+    ingredients:[{n:'Patata al horno',g:100,hc:14},{n:'Merluza (sin HC)',g:150,hc:0},{n:'Tomate',g:50,hc:2}]},
+  { id:'d23', cat:'segundos', emoji:'🥩', name:'Filete con patatas fritas', desc:'Carne con patatas fritas', hc:30,
+    ingredients:[{n:'Patatas fritas caseras',g:100,hc:25},{n:'Carne a la plancha (sin HC)',g:150,hc:0}]},
+  { id:'d24', cat:'segundos', emoji:'🥚', name:'Huevos fritos con patatas', desc:'Huevos fritos y patatas', hc:25,
+    ingredients:[{n:'Patatas fritas caseras',g:80,hc:20},{n:'Huevo frito (sin HC)',g:60,hc:0}]},
+  { id:'d25', cat:'segundos', emoji:'🍕', name:'Pizza margarita', desc:'Media pizza', hc:50,
+    ingredients:[{n:'Pizza base+tomate',g:200,hc:50}]},
+  { id:'d26', cat:'segundos', emoji:'🥗', name:'Ensaladilla rusa', desc:'Patata, zanahoria, guisantes, atún', hc:20,
+    ingredients:[{n:'Patata hervida',g:80,hc:12},{n:'Zanahoria',g:50,hc:3},{n:'Guisantes',g:30,hc:3},{n:'Atún y mayonesa (sin HC)',g:60,hc:0}]},
+  { id:'d27', cat:'segundos', emoji:'🥙', name:'Empanada gallega (porción)', desc:'Masa con relleno de atún o carne', hc:35,
+    ingredients:[{n:'Masa de empanada',g:100,hc:35}]},
+
+  // DESAYUNO
+  { id:'d30', cat:'desayuno', emoji:'🥐', name:'Tostada con aceite', desc:'Pan tostado con aceite de oliva', hc:25,
+    ingredients:[{n:'Pan tostado',g:40,hc:24},{n:'Aceite (sin HC)',g:10,hc:0}]},
+  { id:'d31', cat:'desayuno', emoji:'🥞', name:'Tostada con mermelada', desc:'Pan tostado con mermelada', hc:32,
+    ingredients:[{n:'Pan tostado',g:40,hc:24},{n:'Mermelada normal',g:20,hc:11}]},
+  { id:'d32', cat:'desayuno', emoji:'🥣', name:'Cereales con leche', desc:'Tazón de cereales de desayuno', hc:42,
+    ingredients:[{n:'Cereales desayuno',g:40,hc:27},{n:'Leche',g:150,hc:7}]},
+  { id:'d33', cat:'desayuno', emoji:'🥣', name:'Avena con leche', desc:'Porridge de avena', hc:34,
+    ingredients:[{n:'Avena (copos)',g:50,hc:29},{n:'Leche',g:150,hc:7}]},
+  { id:'d34', cat:'desayuno', emoji:'☕', name:'Café con leche y galletas', desc:'Tazón con 3 galletas María', hc:25,
+    ingredients:[{n:'Leche',g:150,hc:7},{n:'Galletas María x3',g:21,hc:15},{n:'Azúcar sobre',g:8,hc:8}]},
+  { id:'d35', cat:'desayuno', emoji:'🥐', name:'Cruasán', desc:'Cruasán solo', hc:28,
+    ingredients:[{n:'Cruasán',g:60,hc:28}]},
+  { id:'d36', cat:'desayuno', emoji:'🍞', name:'Bocadillo de jamón', desc:'Pan de barra con jamón serrano', hc:45,
+    ingredients:[{n:'Pan blanco (barra)',g:90,hc:45},{n:'Jamón serrano (sin HC)',g:40,hc:0}]},
+  { id:'d37', cat:'desayuno', emoji:'🧇', name:'Magdalenas (2 unidades)', desc:'Dos magdalenas caseras', hc:52,
+    ingredients:[{n:'Magdalena x2',g:100,hc:52}]},
+
+  // ENSALADAS
+  { id:'d40', cat:'ensaladas', emoji:'🥗', name:'Ensalada mixta', desc:'Lechuga, tomate, cebolla, atún', hc:8,
+    ingredients:[{n:'Lechuga',g:100,hc:2},{n:'Tomate',g:100,hc:3},{n:'Cebolla',g:30,hc:2},{n:'Atún (sin HC)',g:60,hc:0}]},
+  { id:'d41', cat:'ensaladas', emoji:'🥗', name:'Ensalada de pasta', desc:'Pasta fría con verduras', hc:42,
+    ingredients:[{n:'Pasta hervida',g:160,hc:40},{n:'Tomate',g:50,hc:2},{n:'Atún (sin HC)',g:60,hc:0}]},
+  { id:'d42', cat:'ensaladas', emoji:'🥗', name:'Ensalada de arroz', desc:'Arroz frío con atún y verduras', hc:38,
+    ingredients:[{n:'Arroz blanco hervido',g:140,hc:36},{n:'Tomate',g:50,hc:2},{n:'Atún (sin HC)',g:60,hc:0}]},
+  { id:'d43', cat:'ensaladas', emoji:'🥗', name:'Gazpacho', desc:'Vaso de gazpacho andaluz', hc:8,
+    ingredients:[{n:'Tomate',g:150,hc:5},{n:'Pimiento',g:30,hc:2},{n:'Pan (miga)',g:10,hc:5}]},
+
+  // POSTRES
+  { id:'d50', cat:'postres', emoji:'🍮', name:'Flan casero', desc:'Flan de huevo con caramelo', hc:25,
+    ingredients:[{n:'Flan',g:110,hc:22},{n:'Caramelo',g:10,hc:8}]},
+  { id:'d51', cat:'postres', emoji:'🍦', name:'Helado de crema (bola)', desc:'Una bola de helado', hc:22,
+    ingredients:[{n:'Helado de crema',g:100,hc:22}]},
+  { id:'d52', cat:'postres', emoji:'🍊', name:'Naranja de postre', desc:'Una naranja mediana', hc:18,
+    ingredients:[{n:'Naranja',g:200,hc:18}]},
+  { id:'d53', cat:'postres', emoji:'🍎', name:'Manzana de postre', desc:'Una manzana mediana', hc:24,
+    ingredients:[{n:'Manzana',g:200,hc:24}]},
+  { id:'d54', cat:'postres', emoji:'🍌', name:'Plátano de postre', desc:'Un plátano pequeño', hc:20,
+    ingredients:[{n:'Plátano',g:100,hc:20}]},
+  { id:'d55', cat:'postres', emoji:'🍮', name:'Natillas', desc:'Tarrina de natillas', hc:22,
+    ingredients:[{n:'Natillas',g:125,hc:22}]},
+  { id:'d56', cat:'postres', emoji:'🍰', name:'Pastel de chocolate (porción)', desc:'Ración de 100g', hc:45,
+    ingredients:[{n:'Bizcocho/bollería',g:60,hc:31},{n:'Chocolate con leche',g:30,hc:17}]},
+  { id:'d57', cat:'postres', emoji:'🍨', name:'Arroz con leche', desc:'Ración casera', hc:40,
+    ingredients:[{n:'Arroz blanco hervido',g:80,hc:20},{n:'Leche',g:200,hc:10},{n:'Azúcar',g:15,hc:15}]},
+
+  // SNACKS
+  { id:'d60', cat:'snacks', emoji:'🥪', name:'Bocadillo de jamón', desc:'Bocadillo con pan de barra', hc:45,
+    ingredients:[{n:'Pan blanco (barra)',g:90,hc:45},{n:'Jamón (sin HC)',g:40,hc:0}]},
+  { id:'d61', cat:'snacks', emoji:'🥪', name:'Bocadillo de atún', desc:'Con tomate y atún', hc:47,
+    ingredients:[{n:'Pan blanco (barra)',g:90,hc:45},{n:'Tomate',g:30,hc:1},{n:'Atún (sin HC)',g:40,hc:0}]},
+  { id:'d62', cat:'snacks', emoji:'🥐', name:'Croissant + zumo', desc:'Desayuno o merienda', hc:56,
+    ingredients:[{n:'Cruasán',g:60,hc:28},{n:'Zumo naranja natural',g:200,hc:18}]},
+  { id:'d63', cat:'snacks', emoji:'🍌', name:'Plátano + yogur', desc:'Snack saludable', hc:28,
+    ingredients:[{n:'Plátano',g:100,hc:20},{n:'Yogur natural',g:125,hc:6}]},
+  { id:'d64', cat:'snacks', emoji:'🍞', name:'Pan con tomate', desc:'Rebanada de pan con tomate rallado', hc:26,
+    ingredients:[{n:'Pan de molde x2',g:50,hc:25},{n:'Tomate',g:30,hc:1}]},
+  { id:'d65', cat:'snacks', emoji:'🧀', name:'Montadito de queso', desc:'Pan tostado con queso fresco', hc:14,
+    ingredients:[{n:'Pan tostado',g:15,hc:10},{n:'Queso fresco (sin HC)',g:50,hc:0}]},
+  { id:'d66', cat:'snacks', emoji:'🍪', name:'Galletas con leche (merienda)', desc:'5 galletas María con vaso leche', hc:44,
+    ingredients:[{n:'Galletas María x5',g:35,hc:26},{n:'Leche',g:200,hc:10}]},
+];
+
+// ══════════════════════════════════════════════════════
+// DATOS: INGREDIENTES
+// ══════════════════════════════════════════════════════
+const FOODS = [
+  {id:1,cat:'lacteos',name:'Leche (cualquier tipo)',hcPer100:4.8,portions:[{name:'Vaso 200ml',g:200},{name:'Taza 150ml',g:150}]},
+  {id:2,cat:'lacteos',name:'Yogur natural',hcPer100:4.5,portions:[{name:'Unidad 125g',g:125},{name:'Unidad grande 200g',g:200}]},
+  {id:3,cat:'lacteos',name:'Yogur sabores/fruta',hcPer100:12,portions:[{name:'Unidad 125g',g:125}]},
+  {id:4,cat:'lacteos',name:'Natillas',hcPer100:18,portions:[{name:'Tarrina 125ml',g:125}]},
+  {id:5,cat:'lacteos',name:'Flan',hcPer100:20,portions:[{name:'Unidad 110g',g:110}]},
+  {id:6,cat:'lacteos',name:'Helado de crema',hcPer100:22,portions:[{name:'Bola 100g',g:100},{name:'Tarrina 150ml',g:150}]},
+  {id:7,cat:'lacteos',name:'Helado de hielo',hcPer100:22,portions:[{name:'Unidad 100ml',g:100}]},
+  {id:8,cat:'lacteos',name:'Queso fresco',hcPer100:3,portions:[{name:'Porción 70g',g:70}]},
+  {id:9,cat:'lacteos',name:'Leche condensada',hcPer100:54,portions:[{name:'Cucharada 20g',g:20}]},
+  {id:10,cat:'lacteos',name:'Kéfir',hcPer100:4,portions:[{name:'Unidad 125ml',g:125}]},
+  {id:11,cat:'cereales',name:'Arroz blanco hervido',hcPer100:26,portions:[{name:'Guarnición 80g',g:80},{name:'Plato mediano 160g',g:160},{name:'Plato grande 240g',g:240}]},
+  {id:12,cat:'cereales',name:'Arroz integral hervido',hcPer100:25,portions:[{name:'Guarnición 80g',g:80},{name:'Plato mediano 160g',g:160}]},
+  {id:13,cat:'cereales',name:'Pasta hervida',hcPer100:25,portions:[{name:'Guarnición 90g',g:90},{name:'Plato mediano 180g',g:180},{name:'Plato grande 270g',g:270}]},
+  {id:14,cat:'cereales',name:'Pasta integral hervida',hcPer100:22,portions:[{name:'Guarnición 90g',g:90},{name:'Plato mediano 180g',g:180}]},
+  {id:15,cat:'cereales',name:'Pan blanco',hcPer100:50,portions:[{name:'Rebanada 25g',g:25},{name:'Panecillo 60g',g:60},{name:'Barra ¼ 45g',g:45}]},
+  {id:16,cat:'cereales',name:'Pan integral',hcPer100:43,portions:[{name:'Rebanada 25g',g:25},{name:'Panecillo 60g',g:60}]},
+  {id:17,cat:'cereales',name:'Pan de molde',hcPer100:50,portions:[{name:'Rebanada 25g',g:25},{name:'2 rebanadas 50g',g:50}]},
+  {id:18,cat:'cereales',name:'Pan tostado / biscote',hcPer100:67,portions:[{name:'Unidad 12g',g:12},{name:'2 unidades 24g',g:24}]},
+  {id:19,cat:'cereales',name:'Patata hervida',hcPer100:15,portions:[{name:'Guarnición 100g',g:100},{name:'Plato mediano 200g',g:200},{name:'Plato grande 300g',g:300}]},
+  {id:20,cat:'cereales',name:'Patata al horno',hcPer100:29,portions:[{name:'Guarnición 60g',g:60},{name:'Ración 150g',g:150}]},
+  {id:21,cat:'cereales',name:'Patatas fritas caseras',hcPer100:33,portions:[{name:'Ración 100g',g:100}]},
+  {id:22,cat:'cereales',name:'Patatas chips',hcPer100:50,portions:[{name:'Bolsa pequeña 30g',g:30}]},
+  {id:23,cat:'cereales',name:'Puré de patatas',hcPer100:11,portions:[{name:'Ración 200g',g:200}]},
+  {id:24,cat:'cereales',name:'Lentejas hervidas',hcPer100:20,portions:[{name:'Guarnición 100g',g:100},{name:'Plato mediano 200g',g:200},{name:'Plato grande 300g',g:300}]},
+  {id:25,cat:'cereales',name:'Garbanzos hervidos',hcPer100:18,portions:[{name:'Guarnición 100g',g:100},{name:'Plato mediano 200g',g:200}]},
+  {id:26,cat:'cereales',name:'Judías blancas hervidas',hcPer100:18,portions:[{name:'Guarnición 100g',g:100},{name:'Plato mediano 200g',g:200}]},
+  {id:27,cat:'cereales',name:'Quinoa hervida',hcPer100:21,portions:[{name:'Guarnición 100g',g:100},{name:'Ración 200g',g:200}]},
+  {id:28,cat:'cereales',name:'Cuscús cocido',hcPer100:22,portions:[{name:'Guarnición 100g',g:100}]},
+  {id:29,cat:'cereales',name:'Avena (copos)',hcPer100:59,portions:[{name:'Ración 40g',g:40},{name:'Ración grande 60g',g:60}]},
+  {id:30,cat:'cereales',name:'Cereales desayuno',hcPer100:67,portions:[{name:'Ración 30g',g:30},{name:'Ración grande 50g',g:50}]},
+  {id:31,cat:'cereales',name:'Boniato hervido',hcPer100:20,portions:[{name:'Unidad mediana 150g',g:150}]},
+  {id:32,cat:'cereales',name:'Maíz en lata',hcPer100:14,portions:[{name:'Ración 80g',g:80}]},
+  {id:33,cat:'cereales',name:'Guisantes',hcPer100:9,portions:[{name:'Guarnición 100g',g:100},{name:'Plato mediano 200g',g:200}]},
+  {id:34,cat:'cereales',name:'Galleta tipo María',hcPer100:74,portions:[{name:'1 galleta 7g',g:7},{name:'3 galletas 21g',g:21},{name:'5 galletas 35g',g:35}]},
+  {id:35,cat:'cereales',name:'Galleta Digestive',hcPer100:63,portions:[{name:'1 galleta 11g',g:11},{name:'3 galletas 33g',g:33}]},
+  {id:36,cat:'cereales',name:'Pizza',hcPer100:25,portions:[{name:'Triángulo 100g',g:100},{name:'Media pizza 200g',g:200}]},
+  {id:37,cat:'cereales',name:'Sushi (porción)',hcPer100:22,portions:[{name:'Pieza 20g',g:20},{name:'6 piezas 150g',g:150}]},
+  {id:40,cat:'frutas',name:'Manzana',hcPer100:12,portions:[{name:'Unidad mediana 200g',g:200}]},
+  {id:41,cat:'frutas',name:'Pera',hcPer100:12,portions:[{name:'Unidad mediana 200g',g:200}]},
+  {id:42,cat:'frutas',name:'Naranja',hcPer100:9,portions:[{name:'Unidad mediana 200g',g:200}]},
+  {id:43,cat:'frutas',name:'Plátano',hcPer100:20,portions:[{name:'Unidad pequeña 100g',g:100},{name:'Unidad mediana 150g',g:150}]},
+  {id:44,cat:'frutas',name:'Mandarina',hcPer100:10,portions:[{name:'Unidad 100g',g:100}]},
+  {id:45,cat:'frutas',name:'Uva',hcPer100:17,portions:[{name:'12 unidades 100g',g:100}]},
+  {id:46,cat:'frutas',name:'Sandía',hcPer100:5,portions:[{name:'Tajada 200g',g:200}]},
+  {id:47,cat:'frutas',name:'Melón',hcPer100:5,portions:[{name:'Tajada 200g',g:200}]},
+  {id:48,cat:'frutas',name:'Melocotón',hcPer100:10,portions:[{name:'Unidad mediana 200g',g:200}]},
+  {id:49,cat:'frutas',name:'Fresas',hcPer100:6,portions:[{name:'8 unidades 200g',g:200}]},
+  {id:50,cat:'frutas',name:'Kiwi',hcPer100:10,portions:[{name:'Unidad 100g',g:100}]},
+  {id:51,cat:'frutas',name:'Mango',hcPer100:15,portions:[{name:'Unidad mediana 200g',g:200}]},
+  {id:52,cat:'frutas',name:'Piña',hcPer100:10,portions:[{name:'2 rodajas 100g',g:100}]},
+  {id:53,cat:'frutas',name:'Cereza',hcPer100:13,portions:[{name:'12 unidades 100g',g:100}]},
+  {id:54,cat:'frutas',name:'Ciruela',hcPer100:11,portions:[{name:'2 unidades 100g',g:100}]},
+  {id:55,cat:'frutas',name:'Higos frescos',hcPer100:16,portions:[{name:'2 unidades 100g',g:100}]},
+  {id:56,cat:'frutas',name:'Caqui',hcPer100:15,portions:[{name:'Unidad mediana 150g',g:150}]},
+  {id:60,cat:'hortalizas',name:'Tomate',hcPer100:3,portions:[{name:'Unidad mediana 150g',g:150}]},
+  {id:61,cat:'hortalizas',name:'Zanahoria',hcPer100:7,portions:[{name:'Unidad mediana 70g',g:70},{name:'Guarnición 150g',g:150}]},
+  {id:62,cat:'hortalizas',name:'Cebolla',hcPer100:8,portions:[{name:'Unidad mediana 150g',g:150},{name:'Cucharada 20g',g:20}]},
+  {id:63,cat:'hortalizas',name:'Pimiento',hcPer100:5,portions:[{name:'Unidad mediana 150g',g:150}]},
+  {id:64,cat:'hortalizas',name:'Calabacín',hcPer100:3,portions:[{name:'Ración 200g',g:200}]},
+  {id:65,cat:'hortalizas',name:'Berenjena',hcPer100:3,portions:[{name:'Ración 200g',g:200}]},
+  {id:66,cat:'hortalizas',name:'Brócoli',hcPer100:3,portions:[{name:'Plato 300g',g:300}]},
+  {id:67,cat:'hortalizas',name:'Espinacas',hcPer100:1,portions:[{name:'Plato 200g',g:200}]},
+  {id:68,cat:'hortalizas',name:'Lechuga',hcPer100:2,portions:[{name:'Ración 70g',g:70},{name:'Plato 150g',g:150}]},
+  {id:69,cat:'hortalizas',name:'Remolacha',hcPer100:7,portions:[{name:'Unidad 150g',g:150}]},
+  {id:70,cat:'hortalizas',name:'Pepino',hcPer100:2,portions:[{name:'Unidad 200g',g:200}]},
+  {id:71,cat:'hortalizas',name:'Judías verdes',hcPer100:4,portions:[{name:'Plato 250g',g:250}]},
+  {id:80,cat:'frutos',name:'Almendras',hcPer100:4,portions:[{name:'Puñado 20g',g:20}]},
+  {id:81,cat:'frutos',name:'Nueces',hcPer100:7,portions:[{name:'Puñado 20g',g:20}]},
+  {id:82,cat:'frutos',name:'Cacahuetes',hcPer100:8,portions:[{name:'Puñado 20g',g:20}]},
+  {id:83,cat:'frutos',name:'Pistachos',hcPer100:16,portions:[{name:'Puñado 20g',g:20}]},
+  {id:84,cat:'frutos',name:'Uvas pasas',hcPer100:66,portions:[{name:'Puñado 20g',g:20}]},
+  {id:85,cat:'frutos',name:'Dátiles secos',hcPer100:70,portions:[{name:'1 unidad 12g',g:12},{name:'3 unidades 36g',g:36}]},
+  {id:86,cat:'frutos',name:'Higos secos',hcPer100:64,portions:[{name:'1 unidad 15g',g:15}]},
+  {id:87,cat:'frutos',name:'Castañas tostadas',hcPer100:40,portions:[{name:'5 unidades 50g',g:50}]},
+  {id:90,cat:'bebidas',name:'Zumo de naranja natural',hcPer100:9,portions:[{name:'Vaso 200ml',g:200}]},
+  {id:91,cat:'bebidas',name:'Zumo comercial (brick)',hcPer100:10,portions:[{name:'Brick 200ml',g:200}]},
+  {id:92,cat:'bebidas',name:'Bebida refrescante cola',hcPer100:10,portions:[{name:'Vaso 200ml',g:200},{name:'Lata 330ml',g:330}]},
+  {id:93,cat:'bebidas',name:'Bebida light / sin azúcar',hcPer100:0,portions:[{name:'Cualquier cantidad',g:0}]},
+  {id:94,cat:'bebidas',name:'Cerveza',hcPer100:3,portions:[{name:'Caña 200ml',g:200},{name:'Tercio 330ml',g:330}]},
+  {id:95,cat:'bebidas',name:'Horchata',hcPer100:17,portions:[{name:'Vaso 200ml',g:200}]},
+  {id:96,cat:'bebidas',name:'Leche de avena',hcPer100:6,portions:[{name:'Vaso 200ml',g:200}]},
+  {id:97,cat:'bebidas',name:'Leche de almendra',hcPer100:3,portions:[{name:'Vaso 200ml',g:200}]},
+  {id:100,cat:'otros',name:'Azúcar',hcPer100:100,portions:[{name:'Sobre 8g',g:8},{name:'Cucharada 20g',g:20}]},
+  {id:101,cat:'otros',name:'Miel',hcPer100:80,portions:[{name:'Cucharada 18g',g:18}]},
+  {id:102,cat:'otros',name:'Mermelada normal',hcPer100:55,portions:[{name:'Cucharada 25g',g:25}]},
+  {id:103,cat:'otros',name:'Mermelada light',hcPer100:28,portions:[{name:'Cucharada 25g',g:25}]},
+  {id:104,cat:'otros',name:'Chocolate con leche',hcPer100:57,portions:[{name:'Onza 10g',g:10},{name:'3 onzas 30g',g:30}]},
+  {id:105,cat:'otros',name:'Chocolate negro >70%',hcPer100:40,portions:[{name:'Onza 10g',g:10},{name:'3 onzas 30g',g:30}]},
+  {id:106,cat:'otros',name:'Croquetas',hcPer100:20,portions:[{name:'3 unidades 90g',g:90}]},
+  {id:107,cat:'otros',name:'Tortilla de patatas',hcPer100:12,portions:[{name:'Tapa 100g',g:100},{name:'Ración 200g',g:200}]},
+  {id:108,cat:'otros',name:'Magdalena',hcPer100:52,portions:[{name:'Unidad 50g',g:50}]},
+  {id:109,cat:'otros',name:'Cruasán',hcPer100:46,portions:[{name:'Unidad 60g',g:60}]},
+  {id:110,cat:'otros',name:'Churros',hcPer100:40,portions:[{name:'2 unidades 25g',g:25},{name:'Ración 100g',g:100}]},
+  {id:111,cat:'otros',name:'Ketchup',hcPer100:22,portions:[{name:'Cucharada 20g',g:20}]},
+  {id:112,cat:'otros',name:'Salsa de tomate',hcPer100:8,portions:[{name:'3 cucharadas 50g',g:50}]},
+  {id:113,cat:'otros',name:'Hummus',hcPer100:10,portions:[{name:'Ración 100g',g:100}]},
+  {id:114,cat:'otros',name:'Pizza',hcPer100:25,portions:[{name:'Triángulo 100g',g:100},{name:'Media pizza 200g',g:200}]},
+  {id:115,cat:'otros',name:'Turrón Alicante/Jijona',hcPer100:55,portions:[{name:'1/6 tableta 50g',g:50}]},
+  {id:116,cat:'otros',name:'Palomitas',hcPer100:50,portions:[{name:'Ración 20g',g:20}]},
+];
+
+// ══════════════════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════════════════
+let plate = [];
+let platoCat = 'all', platoSearch = '';
+let ingCat = 'all', ingSearch = '';
+
+// ══════════════════════════════════════════════════════
+// PLATE (columna derecha compartida)
+// ══════════════════════════════════════════════════════
+const PLATE_HTML = `
+  <div class="plate-title">🍽️ Mi plato</div>
+  <div class="plate-sub">Pulsa para añadir alimentos</div>
+  <div id="plate-empty" class="plate-empty-msg">
+    <div class="e-icon">🥗</div>
+    <p>Aquí aparecen los alimentos que añadas</p>
+  </div>
+  <div id="plate-list" class="plate-list" style="display:none"></div>
+  <div id="total-card" class="total-card" style="display:none">
+    <div class="tc-label">Total hidratos</div>
+    <div><span id="tc-num" class="tc-num">0</span> <span class="tc-unit">g HC</span></div>
+    <div id="tc-rac" class="tc-rac">0 raciones</div>
+  </div>
+  <button id="clear-btn" class="clear-btn" style="display:none" onclick="clearPlate()">🗑 Vaciar plato</button>
+  <div class="disclaimer-txt">⚠️ Estimación orientativa. Consulta siempre con tu médico antes de ajustar el tratamiento.</div>
+  <button class="install-toggle" onclick="toggleInstall()">📲 Guardar como app en el móvil ▾</button>
+  <div class="install-body" id="install-body">
+    <div class="install-os"><strong>🍎 iPhone (Safari)</strong><ol><li>Abre en Safari</li><li>Pulsa compartir ⬆</li><li>«Añadir a pantalla de inicio»</li><li>Pulsa «Añadir»</li></ol></div>
+    <div class="install-os"><strong>🤖 Android (Chrome)</strong><ol><li>Abre en Chrome</li><li>Pulsa los tres puntos ⋮</li><li>«Añadir a pantalla de inicio»</li><li>Pulsa «Añadir»</li></ol></div>
+  </div>
+`;
+document.getElementById('plate-col-1').innerHTML = PLATE_HTML;
+document.getElementById('plate-col-2').innerHTML = PLATE_HTML;
+document.getElementById('plate-col-3').innerHTML = PLATE_HTML;
+
+function renderPlate() {
+  ['1','2','3'].forEach(n => {
+    const col = document.getElementById(`plate-col-${n}`);
+    if (!col) return;
+    const empty = col.querySelector('#plate-empty');
+    const list = col.querySelector('#plate-list');
+    const card = col.querySelector('#total-card');
+    const clr = col.querySelector('#clear-btn');
+    const num = col.querySelector('#tc-num');
+    const rac = col.querySelector('#tc-rac');
+
+    if (plate.length === 0) {
+      empty.style.display = 'flex';
+      list.style.display = 'none';
+      card.style.display = 'none';
+      clr.style.display = 'none';
+    } else {
+      empty.style.display = 'none';
+      list.style.display = 'flex';
+      card.style.display = 'block';
+      clr.style.display = 'block';
+      list.innerHTML = plate.map((item, i) => `
+        <div class="plate-item">
+          <div class="pi-info">
+            <div class="pi-name">${item.name}</div>
+            <div class="pi-portion">${item.portion}</div>
+          </div>
+          <div class="pi-hc">${item.hc}g</div>
+          <button class="pi-del" onclick="removeItem(${i})">✕</button>
+        </div>
+      `).join('');
+      const total = plate.reduce((s,i) => s+i.hc, 0);
+      num.textContent = total;
+      rac.textContent = `${(total/10).toFixed(1)} raciones (1 ración = 10g HC)`;
+      updateHeader(total);
+    }
+  });
+  const total = plate.reduce((s,i) => s+i.hc, 0);
+  updateHeader(total);
+}
+
+function updateHeader(hc) {
+  const pill = document.getElementById('header-total');
+  pill.textContent = `${hc} g HC`;
+  pill.classList.toggle('active', hc > 0);
+}
+
+function addItem(name, portion, hc) {
+  plate.push({ name, portion, hc });
+  renderPlate();
+}
+
+function removeItem(i) { plate.splice(i,1); renderPlate(); }
+function clearPlate() { plate = []; renderPlate(); }
+function toggleInstall() {
+  document.querySelectorAll('.install-body').forEach(el => el.classList.toggle('open'));
+}
+
+// ══════════════════════════════════════════════════════
+// PANEL 1: PLATOS
+// ══════════════════════════════════════════════════════
+function renderDishes() {
+  const filtered = DISHES.filter(d => {
+    const matchCat = platoCat === 'all' || d.cat === platoCat;
+    const matchS = !platoSearch || d.name.toLowerCase().includes(platoSearch.toLowerCase()) || d.desc.toLowerCase().includes(platoSearch.toLowerCase());
+    return matchCat && matchS;
+  });
+
+  const catNames = {primeros:'🥘 Primeros platos',segundos:'🍗 Segundos platos',desayuno:'☕ Desayuno y merienda',ensaladas:'🥗 Ensaladas y sopas frías',postres:'🍮 Postres',snacks:'🥪 Snacks y bocadillos'};
+
+  if (filtered.length === 0) {
+    document.getElementById('platos-list').innerHTML = `<div class="no-results">😕 No encontramos «${platoSearch}»</div>`;
+    return;
+  }
+
+  let html = '';
+  if (platoSearch || platoCat !== 'all') {
+    html = `<div class="dishes-grid">${filtered.map(dishHTML).join('')}</div>`;
+  } else {
+    const groups = {};
+    filtered.forEach(d => { if (!groups[d.cat]) groups[d.cat] = []; groups[d.cat].push(d); });
+    html = Object.entries(groups).map(([cat, items]) =>
+      `<div style="margin-bottom:24px"><div class="section-title">${catNames[cat]||cat}</div><div class="dishes-grid">${items.map(dishHTML).join('')}</div></div>`
+    ).join('');
+  }
+  document.getElementById('platos-list').innerHTML = html;
+
+  document.querySelectorAll('.dish-expand').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      btn.closest('.dish-card').classList.toggle('open');
+    });
+  });
+  document.querySelectorAll('.dish-header').forEach(h => {
+    h.addEventListener('click', () => h.closest('.dish-card').classList.toggle('open'));
+  });
+  document.querySelectorAll('.dish-add-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const dish = DISHES.find(d => d.id === id);
+      if (dish) addItem(dish.name, 'Plato completo', dish.hc);
+    });
+  });
+}
+
+function dishHTML(d) {
+  const ingList = d.ingredients.map(i => `<li>${i.n} (${i.g}g)<span>${i.hc}g HC</span></li>`).join('');
+  return `
+    <div class="dish-card" id="dc-${d.id}">
+      <div class="dish-header">
+        <span class="dish-emoji">${d.emoji}</span>
+        <div class="dish-info">
+          <div class="dish-name">${d.name}</div>
+          <div class="dish-desc">${d.desc}</div>
+        </div>
+        <div class="dish-hc-badge">${d.hc}g HC</div>
+        <button class="dish-expand">▾</button>
+      </div>
+      <div class="dish-detail">
+        <ul class="dish-ingredients">${ingList}</ul>
+        <button class="dish-add-btn" data-id="${d.id}">➕ Añadir al plato</button>
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('platos-search').addEventListener('input', e => {
+  platoSearch = e.target.value.trim();
+  platoCat = 'all';
+  document.querySelectorAll('#platos-cats .cat-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('#platos-cats .cat-btn[data-cat="all"]').classList.add('active');
+  renderDishes();
+});
+document.getElementById('platos-cats').addEventListener('click', e => {
+  const btn = e.target.closest('.cat-btn');
+  if (!btn) return;
+  platoCat = btn.dataset.cat;
+  platoSearch = '';
+  document.getElementById('platos-search').value = '';
+  document.querySelectorAll('#platos-cats .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDishes();
+});
+
+// ══════════════════════════════════════════════════════
+// PANEL 2: INGREDIENTES
+// ══════════════════════════════════════════════════════
+function renderIngredients() {
+  const filtered = FOODS.filter(f => {
+    const matchCat = ingCat === 'all' || f.cat === ingCat;
+    const matchS = !ingSearch || f.name.toLowerCase().includes(ingSearch.toLowerCase());
+    return matchCat && matchS;
+  });
+
+  const catNames = {lacteos:'🥛 Lácteos',cereales:'🌾 Cereales, pan, pasta y tubérculos',frutas:'🍎 Frutas',hortalizas:'🥦 Hortalizas',frutos:'🥜 Frutos secos',bebidas:'🥤 Bebidas',otros:'🍕 Otros'};
+
+  if (filtered.length === 0) {
+    document.getElementById('ing-list').innerHTML = `<div class="no-results">😕 No encontramos «${ingSearch}»</div>`;
+    return;
+  }
+
+  let html = '';
+  if (ingSearch || ingCat !== 'all') {
+    html = `<div class="food-grid">${filtered.map(foodHTML).join('')}</div>`;
+  } else {
+    const groups = {};
+    filtered.forEach(f => { if (!groups[f.cat]) groups[f.cat] = []; groups[f.cat].push(f); });
+    html = Object.entries(groups).map(([cat, items]) =>
+      `<div style="margin-bottom:24px"><div class="section-title">${catNames[cat]||cat}</div><div class="food-grid">${items.map(foodHTML).join('')}</div></div>`
+    ).join('');
+  }
+  document.getElementById('ing-list').innerHTML = html;
+
+  document.querySelectorAll('.portion-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const f = FOODS.find(x => x.id === parseInt(btn.dataset.food));
+      const p = f.portions[parseInt(btn.dataset.pi)];
+      const hc = Math.round(f.hcPer100 * p.g / 100);
+      addItem(f.name, p.name, hc);
+    });
+  });
+}
+
+function foodHTML(f) {
+  const btns = f.portions.map((p,i) => {
+    const hc = Math.round(f.hcPer100 * p.g / 100);
+    return `<button class="portion-btn" data-food="${f.id}" data-pi="${i}">${p.name} · ${hc}g HC</button>`;
+  }).join('');
+  return `<div class="food-item"><span class="food-name">${f.name}</span><div class="food-portions">${btns}</div></div>`;
+}
+
+document.getElementById('ing-search').addEventListener('input', e => {
+  ingSearch = e.target.value.trim();
+  ingCat = 'all';
+  document.querySelectorAll('#ing-cats .cat-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('#ing-cats .cat-btn[data-cat="all"]').classList.add('active');
+  renderIngredients();
+});
+document.getElementById('ing-cats').addEventListener('click', e => {
+  const btn = e.target.closest('.cat-btn');
+  if (!btn) return;
+  ingCat = btn.dataset.cat;
+  ingSearch = '';
+  document.getElementById('ing-search').value = '';
+  document.querySelectorAll('#ing-cats .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderIngredients();
+});
+
+// ══════════════════════════════════════════════════════
+// PANEL 3: MIS PLATOS (localStorage)
+// ══════════════════════════════════════════════════════
+function loadCustomDishes() {
+  try { return JSON.parse(localStorage.getItem('contahc_dishes') || '[]'); }
+  catch { return []; }
+}
+function saveCustomDishes(dishes) {
+  try { localStorage.setItem('contahc_dishes', JSON.stringify(dishes)); } catch {}
+}
+
+function saveCustomDish() {
+  const name = document.getElementById('new-name').value.trim();
+  const desc = document.getElementById('new-desc').value.trim();
+  const hc = parseInt(document.getElementById('new-hc').value);
+  const portion = document.getElementById('new-portion').value.trim() || 'Ración habitual';
+
+  if (!name) { alert('Por favor escribe el nombre del plato'); return; }
+  if (isNaN(hc) || hc < 0) { alert('Por favor indica los hidratos de carbono en gramos'); return; }
+
+  const dishes = loadCustomDishes();
+  dishes.unshift({ id: Date.now(), name, desc, hc, portion });
+  saveCustomDishes(dishes);
+
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-desc').value = '';
+  document.getElementById('new-hc').value = '';
+  document.getElementById('new-portion').value = '';
+
+  renderCustomDishes();
+}
+
+function deleteCustomDish(id) {
+  const dishes = loadCustomDishes().filter(d => d.id !== id);
+  saveCustomDishes(dishes);
+  renderCustomDishes();
+}
+
+function renderCustomDishes() {
+  const dishes = loadCustomDishes();
+  const el = document.getElementById('custom-dishes-list');
+  if (dishes.length === 0) {
+    el.innerHTML = `<div class="empty-custom">✨ Aún no tienes platos guardados.<br>Añade tus comidas habituales arriba<br>y aparecerán aquí para siempre.</div>`;
+    return;
+  }
+  el.innerHTML = `<div class="custom-dishes">${dishes.map(d => `
+    <div class="custom-dish">
+      <div class="custom-dish-info">
+        <div class="custom-dish-name">${d.name}</div>
+        <div class="custom-dish-detail">${d.desc || d.portion}</div>
+      </div>
+      <div class="custom-dish-hc">${d.hc}g HC</div>
+      <button class="custom-dish-add" onclick="addItem('${d.name.replace(/'/g,"\\'")}','${d.portion.replace(/'/g,"\\'")}',${d.hc})">＋ Añadir</button>
+      <button class="custom-dish-del" onclick="deleteCustomDish(${d.id})" title="Eliminar">✕</button>
+    </div>
+  `).join('')}</div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
+  });
+});
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+renderDishes();
+renderIngredients();
+renderCustomDishes();
+renderPlate();
+</script>
+
+
+</body></html>
