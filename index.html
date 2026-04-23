@@ -100,6 +100,44 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 .empty-state{text-align:center;padding:40px 16px;color:var(--brown-l);font-size:0.85rem;font-weight:300;line-height:1.6;}
 .empty-state .ei{font-size:2.5rem;margin-bottom:8px;}
 .no-results{text-align:center;padding:40px 16px;color:var(--brown-l);font-size:0.85rem;}
+.cw-wrap{display:flex;align-items:center;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);}
+.cw-label{font-size:0.72rem;color:var(--brown-l);white-space:nowrap;}
+.cw-input{width:64px;padding:6px 8px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--brown);outline:none;background:var(--cream);text-align:center;-webkit-appearance:none;}
+.cw-input:focus{border-color:var(--terra);}
+.cw-result{font-size:0.78rem;font-weight:700;color:var(--terra);min-width:48px;}
+.cw-btn{flex:1;background:var(--terra);color:white;border:none;border-radius:9px;padding:7px 8px;font-family:'DM Sans',sans-serif;font-size:0.76rem;font-weight:600;cursor:pointer;}
+.cw-btn:active{transform:scale(0.97);}
+
+/* BUILDER */
+.builder-search-wrap{position:relative;margin-bottom:12px;}
+.builder-search-wrap input{width:100%;padding:12px 14px 12px 38px;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--brown);outline:none;background:var(--cream);-webkit-appearance:none;}
+.builder-search-wrap input:focus{border-color:var(--terra);}
+.builder-search-wrap .si{left:13px;font-size:1rem;}
+.builder-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--white);border:1.5px solid var(--border);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.12);z-index:200;max-height:60vh;overflow-y:auto;display:none;}
+.builder-dropdown.open{display:block;}
+.builder-option{padding:12px 14px;font-size:0.88rem;color:var(--brown);border-bottom:1px solid var(--border);}
+.builder-option:last-child{border-bottom:none;}
+.builder-option strong{display:block;font-weight:600;font-size:0.9rem;margin-bottom:6px;}
+.bo-row{display:flex;align-items:center;gap:8px;}
+.bo-hint{font-size:0.7rem;color:var(--brown-l);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bo-add{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.bo-ginput{width:62px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;text-align:center;outline:none;background:var(--cream);color:var(--brown);-webkit-appearance:none;}
+.bo-ginput:focus{border-color:var(--terra);}
+.bo-hc{font-size:0.75rem;font-weight:700;color:var(--terra);white-space:nowrap;min-width:46px;text-align:right;}
+.bo-btn{background:var(--terra);color:white;border:none;border-radius:8px;padding:7px 12px;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+.bo-btn:active{transform:scale(0.95);}
+
+.builder-items{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.builder-item{background:var(--cream);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.bi-name{flex:1;font-size:0.84rem;font-weight:500;color:var(--brown);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bi-ginput{width:62px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.84rem;text-align:center;outline:none;background:var(--white);color:var(--brown);-webkit-appearance:none;}
+.bi-ginput:focus{border-color:var(--terra);}
+.bi-hc{font-size:0.8rem;font-weight:700;color:var(--terra);min-width:48px;text-align:right;white-space:nowrap;}
+.bi-del{background:none;border:none;color:var(--brown-l);cursor:pointer;font-size:1.1rem;padding:4px;flex-shrink:0;}
+
+.builder-total{display:flex;justify-content:space-between;align-items:center;background:var(--sage);border-radius:12px;padding:12px 16px;margin-bottom:12px;}
+.builder-total span{font-size:0.84rem;color:white;font-weight:500;}
+.builder-total-hc{font-family:'Fraunces',serif;font-size:1.3rem;color:white;font-weight:500;}
 
 /* SHEET */
 .sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.3s;}
@@ -222,23 +260,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
   </div>
 
   <div class="panel" id="panel-misplatos">
-    <div class="mis-intro">
-      <strong>💾 Tus platos guardados</strong>
-      Añade aquí los platos que comes habitualmente. Se guardan en tu móvil para siempre.
-    </div>
+
+    <!-- CONSTRUCTOR DE PLATO -->
     <div class="form-card">
       <label class="flabel">Nombre del plato</label>
-      <input class="finput" id="new-name" placeholder="Ej: Macarrones del martes">
-      <label class="flabel">Descripción (opcional)</label>
-      <input class="finput" id="new-desc" placeholder="Ej: Con tomate y atún">
-      <div class="frow">
-        <div style="flex:1"><label class="flabel">Hidratos (g)</label><input class="finput" id="new-hc" type="number" min="0" placeholder="Ej: 55"></div>
-        <div style="flex:1"><label class="flabel">Ración</label><input class="finput" id="new-portion" placeholder="Ej: 1 plato"></div>
+      <input class="finput" id="new-name" placeholder="Ej: Mis lentejas del martes">
+
+      <!-- Buscador de ingredientes -->
+      <label class="flabel">Añadir ingredientes</label>
+      <div class="builder-search-wrap">
+        <span class="si">🔍</span>
+        <input type="text" id="builder-search" placeholder="Buscar ingrediente..." autocomplete="off">
+        <div id="builder-dropdown" class="builder-dropdown"></div>
       </div>
+
+      <!-- Lista de ingredientes añadidos -->
+      <div id="builder-items" class="builder-items"></div>
+
+      <!-- Total HC -->
+      <div class="builder-total" id="builder-total" style="display:none">
+        <span>Total hidratos:</span>
+        <span id="builder-total-num" class="builder-total-hc">0g HC</span>
+      </div>
+
       <button class="save-btn" onclick="saveCustomDish()">💾 Guardar plato</button>
     </div>
+
     <div class="sec-title">Mis platos guardados</div>
-    <div id="custom-dishes-list"><div class="empty-state"><div class="ei">✨</div>Aún no tienes platos guardados.<br>Añade tus comidas habituales arriba<br>y aparecerán aquí para siempre.</div></div>
+    <div id="custom-dishes-list"><div class="empty-state"><div class="ei">✨</div>Aún no tienes platos guardados.<br>Constrúyelos arriba ingrediente a ingrediente<br>y aparecerán aquí para siempre.</div></div>
   </div>
 
   <!-- PANEL 4: FOTO CON IA -->
@@ -543,31 +592,164 @@ function renderIngredients(){
   document.querySelectorAll('.portion-btn').forEach(btn=>btn.addEventListener('click',()=>{const f=FOODS.find(x=>x.id===parseInt(btn.dataset.food));const p=f.portions[parseInt(btn.dataset.pi)];const hc=Math.round(f.hcPer100*p.g/100);addItem(f.name,p.name,hc);}));
 }
 function foodHTML(f){
-  return `<div class="food-item"><div class="food-name">${f.name}</div><div class="portions-wrap">${f.portions.map((p,i)=>`<button class="portion-btn" data-food="${f.id}" data-pi="${i}">${p.name}<strong>${Math.round(f.hcPer100*p.g/100)}g HC</strong></button>`).join('')}</div></div>`;
+  const esc = f.name.replace(/'/g,"\\'");
+  return `<div class="food-item">
+    <div class="food-name">${f.name}</div>
+    <div class="portions-wrap">${f.portions.map((p,i)=>`<button class="portion-btn" data-food="${f.id}" data-pi="${i}">${p.name}<strong>${Math.round(f.hcPer100*p.g/100)}g HC</strong></button>`).join('')}</div>
+    <div class="cw-wrap">
+      <span class="cw-label">Peso exacto:</span>
+      <input type="number" class="cw-input" min="1" max="2000" placeholder="g" data-hc="${f.hcPer100}" data-name="${esc}" oninput="cwCalc(this)">
+      <span class="cw-result" id="cwr-${f.id}">—</span>
+      <button class="cw-btn" data-fid="${f.id}" onclick="cwAdd(this)">➕ Añadir</button>
+    </div>
+  </div>`;
+}
+function cwCalc(inp){
+  const g=parseInt(inp.value);
+  const hc100=parseFloat(inp.dataset.hc);
+  const fid=inp.closest('.food-item').querySelector('.cw-btn').dataset.fid;
+  const span=document.getElementById('cwr-'+fid);
+  if(g>0){span.textContent=Math.round(hc100*g/100)+'g HC';}
+  else{span.textContent='—';}
+}
+function cwAdd(btn){
+  const wrap=btn.closest('.cw-wrap');
+  const inp=wrap.querySelector('.cw-input');
+  const g=parseInt(inp.value);
+  const hc100=parseFloat(inp.dataset.hc);
+  const name=inp.dataset.name;
+  if(!g||g<=0){inp.focus();return;}
+  const hc=Math.round(hc100*g/100);
+  addItem(name, g+'g (peso exacto)', hc);
+  inp.value='';
+  const fid=btn.dataset.fid;
+  document.getElementById('cwr-'+fid).textContent='—';
 }
 document.getElementById('ing-search').addEventListener('input',e=>{ingSearch=e.target.value.trim();ingCat='all';document.querySelectorAll('#ing-cats .cat-btn').forEach(b=>b.classList.remove('active'));document.querySelector('#ing-cats .cat-btn[data-cat="all"]').classList.add('active');renderIngredients();});
 document.getElementById('ing-cats').addEventListener('click',e=>{const btn=e.target.closest('.cat-btn');if(!btn)return;ingCat=btn.dataset.cat;ingSearch='';document.getElementById('ing-search').value='';document.querySelectorAll('#ing-cats .cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderIngredients();});
 
-// MIS PLATOS
+// MIS PLATOS - CONSTRUCTOR
+let builderItems = []; // {food, g, hc}
+
+function builderCalcTotal(){
+  const total = builderItems.reduce((s,i)=>s+i.hc,0);
+  const el = document.getElementById('builder-total');
+  const num = document.getElementById('builder-total-num');
+  if(builderItems.length>0){el.style.display='flex';num.textContent=total+'g HC';}
+  else{el.style.display='none';}
+}
+
+function builderRenderItems(){
+  const el = document.getElementById('builder-items');
+  if(!builderItems.length){el.innerHTML='';builderCalcTotal();return;}
+  el.innerHTML = builderItems.map((item,i)=>`
+    <div class="builder-item">
+      <span class="bi-name">${item.food.name}</span>
+      <input class="bi-ginput" type="number" min="1" max="2000" value="${item.g}" data-i="${i}" oninput="builderUpdateG(this)">
+      <span class="bi-hc" id="bi-hc-${i}">${item.hc}g HC</span>
+      <button class="bi-del" onclick="builderRemove(${i})">✕</button>
+    </div>
+  `).join('');
+  builderCalcTotal();
+}
+
+function builderUpdateG(inp){
+  const i = parseInt(inp.dataset.i);
+  const g = parseInt(inp.value)||0;
+  builderItems[i].g = g;
+  builderItems[i].hc = Math.round(builderItems[i].food.hcPer100 * g / 100);
+  const span = document.getElementById('bi-hc-'+i);
+  if(span) span.textContent = builderItems[i].hc+'g HC';
+  builderCalcTotal();
+}
+
+function builderRemove(i){
+  builderItems.splice(i,1);
+  builderRenderItems();
+}
+
+// Buscador del constructor
+const builderSearchInput = document.getElementById('builder-search');
+const builderDropdown = document.getElementById('builder-dropdown');
+
+builderSearchInput.addEventListener('input', ()=>{
+  const q = builderSearchInput.value.trim().toLowerCase();
+  if(!q){builderDropdown.classList.remove('open');return;}
+  const results = FOODS.filter(f=>f.name.toLowerCase().includes(q)).slice(0,8);
+  if(!results.length){builderDropdown.classList.remove('open');return;}
+  builderDropdown.innerHTML = results.map(f=>{
+    const defaultG = f.portions[0]?f.portions[0].g:100;
+    const defaultHC = Math.round(f.hcPer100*defaultG/100);
+    return `<div class="builder-option" data-id="${f.id}" data-hc100="${f.hcPer100}" data-defaultg="${defaultG}">
+      <strong>${f.name}</strong>
+      <div class="bo-row">
+        <span class="bo-hint">${f.portions.map(p=>p.name).join(' · ')}</span>
+        <div class="bo-add">
+          <input class="bo-ginput" type="number" min="1" max="2000" value="${defaultG}" placeholder="g" onclick="event.stopPropagation()" oninput="boCalc(this,${f.hcPer100})">
+          <span class="bo-hc" id="bohc-${f.id}">${defaultHC}g HC</span>
+          <button class="bo-btn" data-fid="${f.id}" onclick="event.stopPropagation();boConfirm(this)">➕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  builderDropdown.classList.add('open');
+});
+
+document.addEventListener('click', e=>{
+  if(!builderDropdown.contains(e.target)&&e.target!==builderSearchInput){
+    builderDropdown.classList.remove('open');
+  }
+});
+
+function boCalc(inp, hc100){
+  const g = parseInt(inp.value)||0;
+  const opt = inp.closest('.builder-option');
+  const fid = opt.dataset.id;
+  const span = document.getElementById('bohc-'+fid);
+  if(span) span.textContent = Math.round(hc100*g/100)+'g HC';
+}
+
+function boConfirm(btn){
+  const opt = btn.closest('.builder-option');
+  const fid = parseInt(opt.dataset.id);
+  const hc100 = parseFloat(opt.dataset.hc100);
+  const ginput = opt.querySelector('.bo-ginput');
+  const g = parseInt(ginput.value)||parseInt(opt.dataset.defaultg)||100;
+  const hc = Math.round(hc100*g/100);
+  const food = FOODS.find(f=>f.id===fid);
+  if(!food)return;
+  builderItems.push({food,g,hc});
+  builderRenderItems();
+  builderSearchInput.value='';
+  builderDropdown.classList.remove('open');
+}
+
 function loadC(){try{return JSON.parse(localStorage.getItem('sinpicos_dishes')||'[]');}catch{return[];}}
 function saveC(d){try{localStorage.setItem('sinpicos_dishes',JSON.stringify(d));}catch{}}
+
 function saveCustomDish(){
-  const name=document.getElementById('new-name').value.trim();
-  const desc=document.getElementById('new-desc').value.trim();
-  const hc=parseInt(document.getElementById('new-hc').value);
-  const portion=document.getElementById('new-portion').value.trim()||'Ración habitual';
+  const name = document.getElementById('new-name').value.trim();
   if(!name){alert('Por favor escribe el nombre del plato');return;}
-  if(isNaN(hc)||hc<0){alert('Por favor indica los hidratos en gramos');return;}
-  const d=loadC();d.unshift({id:Date.now(),name,desc,hc,portion});saveC(d);
-  ['new-name','new-desc','new-hc','new-portion'].forEach(id=>document.getElementById(id).value='');
-  renderCustomDishes();showToast('💾 Plato guardado');
+  if(!builderItems.length){alert('Añade al menos un ingrediente');return;}
+  const hc = builderItems.reduce((s,i)=>s+i.hc,0);
+  const desc = builderItems.map(i=>i.food.name).join(', ');
+  const d = loadC();
+  d.unshift({id:Date.now(), name, desc, hc, portion:'Ración completa'});
+  saveC(d);
+  document.getElementById('new-name').value='';
+  builderItems=[];
+  builderRenderItems();
+  renderCustomDishes();
+  showToast('💾 Plato guardado');
 }
+
 function deleteCustomDish(id){saveC(loadC().filter(d=>d.id!==id));renderCustomDishes();}
+
 function renderCustomDishes(){
   const dishes=loadC();
   const el=document.getElementById('custom-dishes-list');
-  if(!dishes.length){el.innerHTML=`<div class="empty-state"><div class="ei">✨</div>Aún no tienes platos guardados.<br>Añade tus comidas habituales arriba<br>y aparecerán aquí para siempre.</div>`;return;}
-  el.innerHTML=dishes.map(d=>`<div class="custom-dish"><div class="cd-info"><div class="cd-name">${d.name}</div><div class="cd-detail">${d.desc||d.portion}</div></div><div class="cd-hc">${d.hc}g HC</div><button class="cd-add" onclick="addItem('${d.name.replace(/'/g,"\\'")}','${d.portion.replace(/'/g,"\\'")}',${d.hc})">＋</button><button class="cd-del" onclick="deleteCustomDish(${d.id})">✕</button></div>`).join('');
+  if(!dishes.length){el.innerHTML=`<div class="empty-state"><div class="ei">✨</div>Aún no tienes platos guardados.<br>Constrúyelos arriba ingrediente a ingrediente<br>y aparecerán aquí para siempre.</div>`;return;}
+  el.innerHTML=dishes.map(d=>`<div class="custom-dish"><div class="cd-info"><div class="cd-name">${d.name}</div><div class="cd-detail">${d.desc}</div></div><div class="cd-hc">${d.hc}g HC</div><button class="cd-add" onclick="addItem('${d.name.replace(/'/g,"\\'")}','Ración completa',${d.hc})">＋</button><button class="cd-del" onclick="deleteCustomDish(${d.id})">✕</button></div>`).join('');
 }
 
 // TABS
