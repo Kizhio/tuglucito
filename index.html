@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
@@ -21,6 +20,17 @@
   --purple:#6B5B8A;--purple-bg:rgba(107,91,138,0.09);
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
+[data-theme="dark"]{
+  --cream:#1A1410;--white:#231C15;
+  --terra:#E8845A;--terra-l:#B85C38;--terra-bg:rgba(232,132,90,0.12);
+  --sage:#8AAD8D;--sage-l:#5C7A5F;
+  --brown:#F0E6DA;--brown-m:#C4A88A;--brown-l:#8A7560;
+  --gold:#E8BC4C;--border:#3A3028;
+  --purple:#A78BFA;--purple-bg:rgba(167,139,250,0.12);
+}
+[data-theme="dark"] .hdr{background:#131010;}
+[data-theme="dark"] .gpt-hero{background:linear-gradient(135deg,#0A0A18 0%,#12101E 60%,#0A1830 100%);}
+
 html,body{height:100%;overflow:hidden;}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown);display:flex;flex-direction:column;}
 
@@ -182,6 +192,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 .ios-os ol{padding-left:16px;}
 .ios-os li{font-size:0.71rem;color:var(--brown-l);line-height:1.7;font-weight:300;}
 
+
+.theme-btn{background:none;border:1px solid rgba(255,255,255,.2);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;flex-shrink:0;transition:all .2s;}
+.theme-btn:active{transform:scale(.9);}
+
+.share-btn{background:none;border:1px solid rgba(255,255,255,.2);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;flex-shrink:0;transition:all .2s;margin-right:6px;}
+.share-btn:active{transform:scale(.9);}
+.hdr-right{display:flex;align-items:center;gap:4px;}
+
+.usearch{padding:0 0 10px;}
+.usearch input{width:100%;padding:13px 16px 13px 44px;background:var(--white);border:1.5px solid var(--terra);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--brown);outline:none;-webkit-appearance:none;}
+.usearch input::placeholder{color:var(--brown-l);}
+.usearch .si{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.05rem;pointer-events:none;}
+.ures{margin-bottom:14px;}
+.ures-cat{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--brown-l);font-weight:700;margin:8px 0 6px;}
+.ures-item{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s;}
+.ures-item:active{transform:scale(.98);border-color:var(--terra);}
+.ures-item .uri-emoji{font-size:1.3rem;flex-shrink:0;}
+.ures-item .uri-info{flex:1;min-width:0;}
+.ures-item .uri-name{font-size:.88rem;font-weight:500;}
+.ures-item .uri-desc{font-size:.72rem;color:var(--brown-l);margin-top:1px;}
+.ures-item .uri-hc{font-size:.82rem;font-weight:700;color:var(--terra);flex-shrink:0;}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--brown);color:white;padding:10px 20px;border-radius:20px;font-size:0.82rem;font-weight:500;z-index:100;opacity:0;pointer-events:none;transition:all 0.3s;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
@@ -213,9 +244,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 
 <div class="hdr">
   <div class="logo">Sin<span>Picos</span></div>
-  <button class="plate-fab" id="fab" onclick="openSheet()">
-    🍽️ Mi plato <span class="fab-count" id="fab-count">0g</span>
-  </button>
+  <div class="hdr-right">
+    <button class="share-btn" onclick="shareWhatsApp()" title="Compartir">📤</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Modo oscuro">🌙</button>
+    <button class="plate-fab" id="fab" onclick="openSheet()">
+      🍽️ Mi plato <span class="fab-count" id="fab-count">0g</span>
+    </button>
+  </div>
 </div>
 
 <div class="tabs">
@@ -226,6 +261,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 </div>
 
 <div class="scroll-area">
+  <!-- Universal search -->
+  <div class="usearch" id="usearch-wrap" style="display:none;padding:10px 14px 0;">
+    <div class="search-wrap" style="margin-bottom:0">
+      <span class="si">🔍</span>
+      <input type="text" id="usearch-input" placeholder="Buscar en todo...">
+    </div>
+  </div>
+  <div class="ures" id="usearch-results" style="display:none;padding:0 14px;"></div>
 
   <div class="panel active" id="panel-platos">
     <div class="search-wrap">
@@ -411,6 +454,21 @@ const DISHES=[
   {id:'d64',cat:'snacks',emoji:'🍞',name:'Pan con tomate',desc:'Rebanada de pan con tomate rallado',hc:26,ingredients:[{n:'Pan de molde x2',g:50,hc:25},{n:'Tomate',g:30,hc:1}]},
   {id:'d65',cat:'snacks',emoji:'🧀',name:'Montadito de queso',desc:'Pan tostado con queso fresco',hc:14,ingredients:[{n:'Pan tostado',g:15,hc:10},{n:'Queso fresco (sin HC)',g:50,hc:0}]},
   {id:'d66',cat:'snacks',emoji:'🍪',name:'Galletas con leche',desc:'5 galletas María con vaso leche',hc:44,ingredients:[{n:'Galletas María x5',g:35,hc:26},{n:'Leche',g:200,hc:10}]},
+
+  {id:'d70',cat:'primeros',emoji:'🍚',name:'Arroz tres delicias',desc:'Arroz, guisantes, huevo, jamón',hc:48,ingredients:[{n:'Arroz blanco hervido',g:180,hc:45},{n:'Guisantes',g:30,hc:3},{n:'Huevo y jamón (sin HC)',g:60,hc:0}]},
+  {id:'d71',cat:'primeros',emoji:'🥣',name:'Salmorejo cordobés',desc:'Tomate, pan, aceite, ajo',hc:15,ingredients:[{n:'Tomate',g:200,hc:6},{n:'Pan (miga)',g:20,hc:10},{n:'Aceite y ajo (sin HC)',g:20,hc:0}]},
+  {id:'d72',cat:'primeros',emoji:'🍲',name:'Cuscús con verduras',desc:'Cuscús, calabacín, zanahoria',hc:38,ingredients:[{n:'Cuscús cocido',g:150,hc:33},{n:'Calabacín',g:100,hc:3},{n:'Zanahoria',g:30,hc:2}]},
+  {id:'d73',cat:'primeros',emoji:'🥘',name:'Arroz caldoso con pollo',desc:'Arroz, pollo, caldo, verduras',hc:42,ingredients:[{n:'Arroz blanco hervido',g:160,hc:40},{n:'Pollo (sin HC)',g:100,hc:0},{n:'Verduras',g:50,hc:2}]},
+  {id:'d74',cat:'primeros',emoji:'🍲',name:'Fideuá',desc:'Fideos, marisco, caldo',hc:40,ingredients:[{n:'Fideos hervidos',g:160,hc:40},{n:'Marisco (sin HC)',g:100,hc:0}]},
+  {id:'d75',cat:'segundos',emoji:'🥩',name:'Solomillo con patatas',desc:'Solomillo cerdo y patatas al horno',hc:28,ingredients:[{n:'Patata al horno',g:100,hc:14},{n:'Solomillo (sin HC)',g:150,hc:0}]},
+  {id:'d76',cat:'segundos',emoji:'🍗',name:'Pollo al limón',desc:'Pechuga con limón y arroz',hc:40,ingredients:[{n:'Arroz blanco hervido',g:160,hc:40},{n:'Pollo (sin HC)',g:150,hc:0}]},
+  {id:'d77',cat:'segundos',emoji:'🐟',name:'Bacalao con pimientos',desc:'Bacalao al horno con pimiento',hc:6,ingredients:[{n:'Pimiento',g:100,hc:5},{n:'Bacalao (sin HC)',g:150,hc:0},{n:'Tomate',g:30,hc:1}]},
+  {id:'d78',cat:'segundos',emoji:'🥩',name:'Patatas bravas',desc:'Patatas fritas con salsa brava',hc:35,ingredients:[{n:'Patatas fritas caseras',g:120,hc:33},{n:'Salsa brava',g:20,hc:2}]},
+  {id:'d79',cat:'segundos',emoji:'🌮',name:'Wrap de pollo',desc:'Tortilla de trigo, pollo, lechuga',hc:30,ingredients:[{n:'Tortilla de trigo',g:60,hc:28},{n:'Pollo y lechuga (sin HC)',g:100,hc:0}]},
+  {id:'d80',cat:'snacks',emoji:'🥪',name:'Bocadillo de tortilla',desc:'Pan con tortilla de patatas',hc:55,ingredients:[{n:'Pan blanco (barra)',g:90,hc:45},{n:'Tortilla de patatas',g:80,hc:10}]},
+  {id:'d81',cat:'snacks',emoji:'🧆',name:'Croquetas (6 uds)',desc:'Croquetas de jamón caseras',hc:36,ingredients:[{n:'Croquetas',g:180,hc:36}]},
+  {id:'d82',cat:'snacks',emoji:'🥪',name:'Bocadillo de lomo',desc:'Pan con lomo a la plancha',hc:45,ingredients:[{n:'Pan blanco (barra)',g:90,hc:45},{n:'Lomo (sin HC)',g:80,hc:0}]},
+  {id:'d83',cat:'snacks',emoji:'🧀',name:'Sandwich mixto',desc:'Pan de molde, jamón york, queso',hc:28,ingredients:[{n:'Pan de molde x2',g:50,hc:25},{n:'Jamón y queso (sin HC)',g:50,hc:0}]},
 ];
 
 const FOODS=[
@@ -763,8 +821,78 @@ document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',
   document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
 }));
 
+
+// ═══ DARK MODE ═══
+function getTheme(){return localStorage.getItem('sp_theme')||'light';}
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('themeBtn').textContent=t==='dark'?'☀️':'🌙';
+  var mc=document.querySelector('meta[name="theme-color"]');
+  if(mc)mc.setAttribute('content',t==='dark'?'#131010':'#2E1F14');
+  localStorage.setItem('sp_theme',t);
+}
+function toggleTheme(){applyTheme(getTheme()==='dark'?'light':'dark');}
+(function(){var t=getTheme();if(t==='dark')document.documentElement.setAttribute('data-theme','dark');})();
+
+// ═══ SHARE WHATSAPP ═══
+function shareWhatsApp(){
+  var total=plate.reduce(function(s,i){return s+i.hc;},0);
+  var rac=(total/10).toFixed(1);
+  var msg='🍽️ *SinPicos — Mi plato*\n\n';
+  msg+='📊 *Total:* '+total+'g HC ('+rac+' raciones)\n';
+  if(plate.length){msg+='\n📋 *Comidas:*\n';plate.forEach(function(x){msg+='• '+x.name+' → '+x.hc+'g HC\n';});}
+  msg+='\n1 ración = 10g HC';
+  var url='https://wa.me/?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+}
+
+// ═══ UNIVERSAL SEARCH ═══
+var _usW=document.getElementById('usearch-wrap');
+var _usI=document.getElementById('usearch-input');
+var _usR=document.getElementById('usearch-results');
+_usW.style.display='block';
+
+function usearchClear(){_usI.value='';_usR.style.display='none';_usR.innerHTML='';}
+function usearchAdd(name,portion,hc){addItem(name,portion,hc);usearchClear();}
+
+_usI.addEventListener('input',function(){
+  var q=_usI.value.trim().toLowerCase();
+  if(!q){_usR.style.display='none';_usR.innerHTML='';return;}
+  _usR.style.display='block';
+  var dR=DISHES.filter(function(x){return x.name.toLowerCase().indexOf(q)!==-1||x.desc.toLowerCase().indexOf(q)!==-1;}).slice(0,5);
+  var fR=FOODS.filter(function(x){return x.name.toLowerCase().indexOf(q)!==-1;}).slice(0,5);
+  var h='';
+  if(dR.length){
+    h+='<div class="ures-cat">\u{1F37D}\uFE0F Platos</div>';
+    for(var di=0;di<dR.length;di++){var x=dR[di];
+      h+='<div class="ures-item" data-utype="dish" data-uid="'+x.id+'">';
+      h+='<span class="uri-emoji">'+x.emoji+'</span>';
+      h+='<div class="uri-info"><div class="uri-name">'+x.name+'</div><div class="uri-desc">'+x.desc+'</div></div>';
+      h+='<span class="uri-hc">'+x.hc+'g HC</span></div>';
+    }
+  }
+  if(fR.length){
+    h+='<div class="ures-cat">\u{1F966} Ingredientes</div>';
+    for(var fi=0;fi<fR.length;fi++){var f=fR[fi];var po=f.portions[0];var hcVal=Math.round(f.hcPer100*po.g/100);
+      h+='<div class="ures-item" data-utype="food" data-uid="'+f.id+'">';
+      h+='<span class="uri-emoji">\u{1F944}</span>';
+      h+='<div class="uri-info"><div class="uri-name">'+f.name+'</div><div class="uri-desc">'+po.name+'</div></div>';
+      h+='<span class="uri-hc">'+hcVal+'g HC</span></div>';
+    }
+  }
+  if(!h)h='<div class="no-results">\u{1F615} Sin resultados</div>';
+  _usR.innerHTML=h;
+  _usR.querySelectorAll('.ures-item').forEach(function(el){
+    el.addEventListener('click',function(){
+      var type=el.dataset.utype;var id=el.dataset.uid;
+      if(type==='dish'){var d=DISHES.find(function(x){return x.id===id;});if(d)usearchAdd(d.name,'Plato completo',d.hc);}
+      else{var f=FOODS.find(function(x){return x.id===parseInt(id);});if(f){var po=f.portions[0];usearchAdd(f.name,po.name,Math.round(f.hcPer100*po.g/100));}}
+    });
+  });
+});
+
 // INIT
-renderDishes();renderIngredients();renderCustomDishes();renderSheet();
+renderDishes();renderIngredients();renderCustomDishes();renderSheet();applyTheme(getTheme());
 </script>
 
 
