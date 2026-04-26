@@ -289,6 +289,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
   <button class="tab-btn" data-tab="ingredientes"><span class="ti">🥦</span>Ingredientes</button>
   <button class="tab-btn" data-tab="misplatos"><span class="ti">⭐</span>Mis platos</button>
   <button class="tab-btn" data-tab="foto"><span class="ti">📸</span>Foto</button>
+  <button class="tab-btn" data-tab="diario"><span class="ti">📋</span>Diario</button>
   <button class="tab-btn" data-tab="pro" id="tab-pro"><span class="ti">👑</span>Pro</button>
 </div>
 
@@ -414,17 +415,82 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
     <div id="foto-pro-banner" style="display:none;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);border-radius:18px;padding:22px 20px;margin-top:14px;text-align:center;color:white;">
       <div style="font-size:1.8rem;margin-bottom:8px;">⭐</div>
       <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:500;margin-bottom:6px;">SinPicos Pro</div>
-      <div style="font-size:0.82rem;opacity:0.85;line-height:1.5;margin-bottom:14px;">15 fotos/día · Platos ilimitados · Diario de comidas · Exportar PDF</div>
+      <div style="font-size:0.82rem;opacity:0.85;line-height:1.5;margin-bottom:14px;">15 fotos/día · Platos ilimitados · Diario · Factor corrección · Exportar PDF</div>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
         <button onclick="activatePro('monthly')" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;border-radius:12px;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;">2,99€/mes</button>
-        <button onclick="activatePro('yearly')" style="background:white;border:none;color:#1a1a2e;border-radius:12px;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;">⭐ 29,99€/año</button>
+        <button onclick="activatePro('yearly')" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);border-radius:12px;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;">29,99€/año · Pronto</button>
       </div>
-      <div style="font-size:0.7rem;opacity:0.6;margin-top:10px;">El pago se integrará próximamente</div>
     </div>
 
   </div>
 
-  <!-- PANEL 5: PRO -->
+  <!-- PANEL 5: DIARIO -->
+  <div class="panel" id="panel-diario">
+
+    <div id="diario-locked" style="display:none;">
+      <div style="text-align:center;padding:40px 16px;">
+        <div style="font-size:3rem;margin-bottom:12px;">🔒</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:500;color:var(--brown);margin-bottom:8px;">Función Pro</div>
+        <div style="font-size:0.85rem;color:var(--brown-l);line-height:1.6;margin-bottom:16px;">El diario de comidas, la calculadora de factor de corrección y la exportación PDF son funciones exclusivas de SinPicos Pro.</div>
+        <button onclick="document.querySelector('[data-tab=pro]').click()" style="background:var(--gold);color:white;border:none;border-radius:12px;padding:13px 28px;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;">👑 Ver planes Pro</button>
+      </div>
+    </div>
+
+    <div id="diario-content" style="display:none;">
+
+      <!-- Calculadora de factor de corrección -->
+      <div class="form-card" style="margin-bottom:16px;">
+        <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500;color:var(--brown);margin-bottom:12px;">🔢 Calculadora de factor de corrección</div>
+        <div style="font-size:0.78rem;color:var(--brown-l);margin-bottom:12px;line-height:1.5;">Introduce tu dosis total diaria de insulina (rápida + lenta) y la app calculará tu factor de sensibilidad usando la regla del 1800.</div>
+        <label class="flabel">Dosis total diaria de insulina (unidades)</label>
+        <input class="finput" id="fc-dosis" type="number" min="1" max="200" placeholder="ej: 30" oninput="calcFC()">
+        <div id="fc-result" style="display:none;background:var(--sage);border-radius:14px;padding:14px 18px;color:white;margin-top:8px;">
+          <div style="font-size:0.78rem;opacity:0.8;">Tu factor de corrección estimado</div>
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <span id="fc-value" style="font-family:'Fraunces',serif;font-size:2rem;font-weight:500;"></span>
+            <span style="font-size:0.85rem;opacity:0.8;">mg/dL por unidad</span>
+          </div>
+          <div id="fc-detail" style="font-size:0.78rem;opacity:0.75;margin-top:6px;"></div>
+        </div>
+        <div style="font-size:0.7rem;color:var(--brown-l);margin-top:10px;line-height:1.4;">⚠️ Cálculo orientativo basado en la regla del 1800. Consulta siempre con tu endocrino para ajustar tu factor real.</div>
+      </div>
+
+      <!-- Conversor HC ↔ Raciones -->
+      <div class="form-card" style="margin-bottom:16px;">
+        <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500;color:var(--brown);margin-bottom:12px;">🔄 Conversor HC ↔ Raciones</div>
+        <div class="frow">
+          <div style="flex:1;">
+            <label class="flabel">Gramos de HC</label>
+            <input class="finput" id="conv-hc" type="number" min="0" placeholder="ej: 45" oninput="convHCtoRac()">
+          </div>
+          <div style="flex:1;">
+            <label class="flabel">Raciones (1 rac = 10g)</label>
+            <input class="finput" id="conv-rac" type="number" min="0" step="0.1" placeholder="ej: 4.5" oninput="convRactoHC()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Guardar en diario -->
+      <div class="form-card" style="margin-bottom:16px;">
+        <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500;color:var(--brown);margin-bottom:12px;">📋 Guardar comida en el diario</div>
+        <label class="flabel">Nombre de la comida</label>
+        <input class="finput" id="diario-meal-name" placeholder="ej: Comida, Cena, Merienda...">
+        <label class="flabel">HC totales (g)</label>
+        <input class="finput" id="diario-meal-hc" type="number" min="0" placeholder="Usa el plato o escribe manualmente">
+        <button class="save-btn" onclick="saveDiarioEntry()" style="background:var(--sage);">📋 Guardar en el diario</button>
+      </div>
+
+      <!-- Historial -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500;color:var(--brown);">Historial de comidas</div>
+        <button onclick="exportDiarioPDF()" style="background:var(--terra);color:white;border:none;border-radius:10px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;">📊 Exportar PDF</button>
+      </div>
+      <div id="diario-list"></div>
+
+    </div>
+  </div>
+
+  <!-- PANEL 6: PRO -->
   <div class="panel" id="panel-pro">
 
     <!-- Hero -->
@@ -451,7 +517,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
           ✓ Modo oscuro<br>
           <span style="color:var(--terra);">📸 2 fotos IA / día</span><br>
           <span style="color:var(--brown-l);">⊘ Máx. 3 platos propios</span><br>
-          <span style="color:var(--brown-l);">⊘ Sin historial</span><br>
+          <span style="color:var(--brown-l);">⊘ Sin diario de comidas</span><br>
+          <span style="color:var(--brown-l);">⊘ Sin calculadora factor corrección</span><br>
           <span style="color:var(--brown-l);">⊘ Sin exportar PDF</span>
         </div>
       </div>
@@ -460,18 +527,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
       <div style="background:var(--white);border:2px solid var(--gold);border-radius:16px;padding:16px 14px;position:relative;">
         <div style="position:absolute;top:-10px;right:12px;background:var(--gold);color:white;font-size:0.65rem;font-weight:700;padding:3px 10px;border-radius:10px;letter-spacing:0.5px;">RECOMENDADO</div>
         <div style="font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:4px;">Pro</div>
-        <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500;color:var(--brown);margin-bottom:12px;">29,99€<span style="font-size:0.7rem;font-weight:400;color:var(--brown-l);">/año</span></div>
+        <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500;color:var(--brown);margin-bottom:12px;">2,99€<span style="font-size:0.7rem;font-weight:400;color:var(--brown-l);">/mes</span></div>
         <div style="font-size:0.78rem;color:var(--brown-m);line-height:1.8;">
           ✓ Todo lo de Free<br>
           <strong style="color:var(--terra);">📸 15 fotos IA / día</strong><br>
           <strong>⭐ Platos ilimitados</strong><br>
           <strong>📋 Diario de comidas</strong><br>
-          <strong>💉 Calculadora de bolo</strong><br>
-          <strong>📊 Exportar PDF/Excel</strong><br>
-          <strong>📦 +500 alimentos</strong><br>
-          <strong>☁️ Backup en la nube</strong><br>
-          <strong>📱 Widget pantalla</strong><br>
-          <strong>🔔 Sin publicidad</strong>
+          <strong>🔢 Calculadora factor corrección</strong><br>
+          <strong>📊 Exportar PDF</strong>
         </div>
       </div>
     </div>
@@ -481,16 +544,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
       <button onclick="activatePro('monthly')" style="width:100%;background:var(--sage);color:white;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
         Suscribirme por 2,99€/mes
       </button>
-      <button onclick="activatePro('yearly')" style="width:100%;background:var(--gold);color:white;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
-        ⭐ Suscribirme por 29,99€/año
+      <button onclick="activatePro('yearly')" style="width:100%;background:var(--gold);color:white;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;opacity:0.6;">
+        ⭐ Suscribirme por 29,99€/año · Próximamente
       </button>
+    </div>
+
+    <!-- PayPal Button -->
+    <div id="paypal-section">
+      <div id="sinpicos-paypal-btn" style="margin-bottom:10px;"></div>
+      <div id="paypal-loading" style="text-align:center;padding:12px;font-size:.82rem;color:var(--brown-l);display:none;">Cargando métodos de pago...</div>
     </div>
 
     <!-- Info -->
     <div style="background:rgba(92,122,95,0.08);border:1.5px solid rgba(92,122,95,0.2);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
       <div style="font-size:0.82rem;color:var(--sage);line-height:1.6;">
-        <strong style="display:block;margin-bottom:4px;">💰 ¿Por qué 29,99€/año?</strong>
-        Son solo 2,50€ al mes — menos que un café. La IA analiza tu comida en cada plato, y mantener ese servicio tiene un coste. Tu suscripción financia directamente la tecnología que te ahorra tiempo cada día.
+        <strong style="display:block;margin-bottom:4px;">💰 ¿Por qué 2,99€/mes?</strong>
+        Cada vez que analizas una foto, la IA procesa tu imagen en tiempo real. Mantener ese servicio tiene un coste. Tu suscripción financia directamente la tecnología que te ahorra tiempo en cada comida.
       </div>
     </div>
 
@@ -511,7 +580,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
     </div>
 
     <div style="text-align:center;padding:8px;font-size:0.72rem;color:var(--brown-l);line-height:1.5;">
-      El pago se integrará próximamente.<br>Ahora puedes usar un código promocional.
+      La suscripción anual se integrará próximamente.<br>Ahora puedes suscribirte mensualmente o usar un código.
+    </div>
+
+    <div style="text-align:center;padding:8px;font-size:0.78rem;">
+      ¿Ya eres Pro? <a href="#" onclick="restorePro();return false" style="color:var(--gold);font-weight:600;text-decoration:none;">Restaurar compra</a>
     </div>
 
   </div>
@@ -734,6 +807,7 @@ function renderSheet(){
       </div>
       ${plate.map((item,i)=>`<div class="plate-item"><div class="pi-info"><div class="pi-name">${item.name}</div><div class="pi-por">${item.portion}</div></div><div class="pi-hc">${item.hc}g HC</div><button class="pi-del" data-i="${i}">✕</button></div>`).join('')}
       <button class="clear-btn" onclick="clearPlate()">🗑 Vaciar plato</button>
+      <button class="clear-btn" onclick="savePlateToD()" style="background:var(--sage);color:white;border-color:var(--sage);">📋 Guardar en el diario</button>
       <div class="disclaimer-txt">⚠️ Estimación orientativa. Consulta siempre con tu médico antes de ajustar el tratamiento.</div>
       ${installHTML()}
     `;
@@ -918,9 +992,14 @@ function saveCustomDish(){
   const name = document.getElementById('new-name').value.trim();
   if(!name){alert('Por favor escribe el nombre del plato');return;}
   if(!builderItems.length){alert('Añade al menos un ingrediente');return;}
+  const d = loadC();
+  // Free: max 3 platos
+  if(getPlan()!=='pro' && d.length>=3){
+    alert('🔒 Has alcanzado el límite de 3 platos en la versión gratuita.\n\nHazte Pro para guardar platos ilimitados.');
+    return;
+  }
   const hc = builderItems.reduce((s,i)=>s+i.hc,0);
   const desc = builderItems.map(i=>i.food.name).join(', ');
-  const d = loadC();
   d.unshift({id:Date.now(), name, desc, hc, portion:'Ración completa'});
   saveC(d);
   document.getElementById('new-name').value='';
@@ -936,7 +1015,9 @@ function renderCustomDishes(){
   const dishes=loadC();
   const el=document.getElementById('custom-dishes-list');
   if(!dishes.length){el.innerHTML=`<div class="empty-state"><div class="ei">✨</div>Aún no tienes platos guardados.<br>Constrúyelos arriba ingrediente a ingrediente<br>y aparecerán aquí para siempre.</div>`;return;}
-  el.innerHTML=dishes.map(d=>`<div class="custom-dish"><div class="cd-info"><div class="cd-name">${d.name}</div><div class="cd-detail">${d.desc}</div></div><div class="cd-hc">${d.hc}g HC</div><button class="cd-add" onclick="addItem('${d.name.replace(/'/g,"\\'")}','Ración completa',${d.hc})">＋</button><button class="cd-del" onclick="deleteCustomDish(${d.id})">✕</button></div>`).join('');
+  var limitHTML='';
+  if(getPlan()!=='pro'){limitHTML='<div style="text-align:center;font-size:0.75rem;color:var(--brown-l);padding:8px 0;">'+dishes.length+'/3 platos · <a href="#" onclick="document.querySelector(\'[data-tab=pro]\').click();return false" style="color:var(--gold);font-weight:600;text-decoration:none;">Hazte Pro para ilimitados</a></div>';}
+  el.innerHTML=dishes.map(d=>`<div class="custom-dish"><div class="cd-info"><div class="cd-name">${d.name}</div><div class="cd-detail">${d.desc}</div></div><div class="cd-hc">${d.hc}g HC</div><button class="cd-add" onclick="addItem('${d.name.replace(/'/g,"\\'")}','Ración completa',${d.hc})">＋</button><button class="cd-del" onclick="deleteCustomDish(${d.id})">✕</button></div>`).join('')+limitHTML;
 }
 
 // TABS
@@ -1119,7 +1200,77 @@ function updateFotoUI(){
 }
 
 function activatePro(type){
-  alert('🚧 Próximamente\n\nEl pago aún no está disponible. Estamos preparando la pasarela de pago.\n\n¡Pronto podrás disfrutar de SinPicos Pro!');
+  if(type==='yearly'){
+    alert('🚧 Próximamente\n\nLa suscripción anual aún no está disponible.\n\n¡Estamos trabajando para tenerla lista pronto!');
+    return;
+  }
+  if(type==='monthly'){
+    // Scroll to PayPal button in Pro tab
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+    document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
+    document.getElementById('tab-pro').classList.add('active');
+    document.getElementById('panel-pro').classList.add('active');
+    loadPayPalSDK();
+    setTimeout(function(){
+      var el=document.getElementById('paypal-section');
+      if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+    },500);
+  }
+}
+
+function activateProAfterPayment(subscriptionID){
+  localStorage.setItem('sp_pro','true');
+  localStorage.setItem('sp_sub_id',subscriptionID);
+  localStorage.setItem('sp_pro_exp',(Date.now()+35*24*60*60*1000).toString());
+  updateFotoUI();
+  showToast('👑 ¡SinPicos Pro activado!');
+}
+
+function restorePro(){
+  var subId=localStorage.getItem('sp_sub_id');
+  if(subId){
+    localStorage.setItem('sp_pro','true');
+    updateFotoUI();
+    showToast('👑 Pro restaurado');
+  } else {
+    showToast('No se encontró suscripción previa');
+  }
+}
+
+// --- PayPal ---
+var paypalRendered=false;
+
+function renderPayPalButton(){
+  if(paypalRendered) return;
+  var container=document.getElementById('sinpicos-paypal-btn');
+  if(!container || typeof paypal==='undefined') return;
+  document.getElementById('paypal-loading').style.display='none';
+  paypalRendered=true;
+  paypal.Buttons({
+    style:{shape:'rect',color:'gold',layout:'vertical',label:'subscribe'},
+    createSubscription:function(data,actions){
+      return actions.subscription.create({
+        plan_id:'P-2YU010977W121804LNHWJKRQ'
+      });
+    },
+    onApprove:function(data,actions){
+      activateProAfterPayment(data.subscriptionID);
+    },
+    onError:function(err){
+      console.error('PayPal error:',err);
+      showToast('❌ Error en el pago. Inténtalo de nuevo.');
+    }
+  }).render('#sinpicos-paypal-btn');
+}
+
+function loadPayPalSDK(){
+  if(document.getElementById('paypal-sdk')) return;
+  var s=document.createElement('script');
+  s.id='paypal-sdk';
+  s.src='https://www.paypal.com/sdk/js?client-id=AUljrgXXeEI8Pl8E6QY7igze33RLIMUaN25nWvgR9Tzd5PNGPo4J2NsiGf5aocdQs7UTbAhF7WBA8ob5&vault=true&intent=subscription&enable-funding=card';
+  s.setAttribute('data-sdk-integration-source','button-factory');
+  s.onload=function(){renderPayPalButton()};
+  document.head.appendChild(s);
 }
 
 // --- Foto handling ---
@@ -1258,8 +1409,183 @@ function fotoAddAll(){
   showToast('✅ Añadido al plato desde foto');
 }
 
+// ═══ DIARIO DE COMIDAS ═══
+function getDiario(){try{return JSON.parse(localStorage.getItem('sp_diario')||'[]');}catch{return[];}}
+function saveDiario(d){localStorage.setItem('sp_diario',JSON.stringify(d));}
+
+function saveDiarioEntry(){
+  var name=document.getElementById('diario-meal-name').value.trim();
+  var hc=parseInt(document.getElementById('diario-meal-hc').value)||0;
+  if(!name){alert('Escribe el nombre de la comida');return;}
+  if(hc<=0){alert('Escribe los HC');return;}
+  var d=getDiario();
+  var now=new Date();
+  d.unshift({id:Date.now(),name:name,hc:hc,date:now.toISOString(),day:now.toISOString().slice(0,10),time:now.toTimeString().slice(0,5)});
+  saveDiario(d);
+  document.getElementById('diario-meal-name').value='';
+  document.getElementById('diario-meal-hc').value='';
+  renderDiario();
+  showToast('📋 Guardado en el diario');
+}
+
+function deleteDiarioEntry(id){
+  saveDiario(getDiario().filter(function(e){return e.id!==id;}));
+  renderDiario();
+}
+
+function renderDiario(){
+  var el=document.getElementById('diario-list');
+  var entries=getDiario();
+  // Show locked or content
+  if(getPlan()!=='pro'){
+    document.getElementById('diario-locked').style.display='block';
+    document.getElementById('diario-content').style.display='none';
+    return;
+  }
+  document.getElementById('diario-locked').style.display='none';
+  document.getElementById('diario-content').style.display='block';
+
+  if(!entries.length){
+    el.innerHTML='<div class="empty-state"><div class="ei">📋</div>No hay comidas registradas.<br>Guarda tu primera comida arriba.</div>';
+    return;
+  }
+  // Group by day
+  var days={};
+  entries.forEach(function(e){
+    if(!days[e.day])days[e.day]=[];
+    days[e.day].push(e);
+  });
+  var html='';
+  Object.keys(days).sort().reverse().forEach(function(day){
+    var items=days[day];
+    var totalHC=items.reduce(function(s,i){return s+i.hc;},0);
+    var rac=(totalHC/10).toFixed(1);
+    var dateStr=formatDiarioDate(day);
+    html+='<div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
+    html+='<div style="font-weight:500;font-size:0.9rem;color:var(--brown);">'+dateStr+'</div>';
+    html+='<div style="font-size:0.82rem;font-weight:700;color:var(--terra);">'+totalHC+'g HC · '+rac+' rac</div>';
+    html+='</div>';
+    items.forEach(function(e){
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);">';
+      html+='<span style="font-size:0.75rem;color:var(--brown-l);min-width:42px;">'+e.time+'</span>';
+      html+='<span style="flex:1;font-size:0.85rem;color:var(--brown-m);">'+e.name+'</span>';
+      html+='<span style="font-size:0.82rem;font-weight:600;color:var(--terra);">'+e.hc+'g</span>';
+      html+='<button onclick="deleteDiarioEntry('+e.id+')" style="background:none;border:none;color:var(--brown-l);cursor:pointer;font-size:0.9rem;padding:2px;">✕</button>';
+      html+='</div>';
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+function formatDiarioDate(dateStr){
+  var d=new Date(dateStr+'T00:00:00');
+  var today=new Date();
+  var todayStr=today.toISOString().slice(0,10);
+  var yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);
+  var yesterdayStr=yesterday.toISOString().slice(0,10);
+  if(dateStr===todayStr) return 'Hoy';
+  if(dateStr===yesterdayStr) return 'Ayer';
+  var dias=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var meses=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return dias[d.getDay()]+' '+d.getDate()+' '+meses[d.getMonth()];
+}
+
+// ═══ CALCULADORA FACTOR DE CORRECCIÓN ═══
+function calcFC(){
+  var dosis=parseFloat(document.getElementById('fc-dosis').value)||0;
+  var resultEl=document.getElementById('fc-result');
+  if(!dosis || dosis<=0){resultEl.style.display='none';return;}
+  var fc=Math.round(1800/dosis);
+  document.getElementById('fc-value').textContent=fc;
+  document.getElementById('fc-detail').textContent='1 unidad de insulina rápida te baja aproximadamente '+fc+' mg/dL (1800 ÷ '+dosis+' = '+fc+')';
+  resultEl.style.display='block';
+}
+
+// ═══ CONVERSOR HC ↔ RACIONES ═══
+function convHCtoRac(){
+  var hc=parseFloat(document.getElementById('conv-hc').value)||0;
+  document.getElementById('conv-rac').value=hc>0?(hc/10).toFixed(1):'';
+}
+function convRactoHC(){
+  var rac=parseFloat(document.getElementById('conv-rac').value)||0;
+  document.getElementById('conv-hc').value=rac>0?Math.round(rac*10):'';
+}
+
+// ═══ EXPORTAR PDF ═══
+function exportDiarioPDF(){
+  var entries=getDiario();
+  if(!entries.length){alert('No hay datos para exportar');return;}
+
+  // Group by day
+  var days={};
+  entries.forEach(function(e){
+    if(!days[e.day])days[e.day]=[];
+    days[e.day].push(e);
+  });
+
+  var content='<html><head><meta charset="UTF-8"><title>SinPicos — Diario de comidas</title>';
+  content+='<style>body{font-family:Arial,sans-serif;padding:30px;color:#333;max-width:700px;margin:0 auto;}';
+  content+='h1{color:#8B5E3C;font-size:22px;border-bottom:2px solid #8B5E3C;padding-bottom:8px;}';
+  content+='h2{color:#5C7A5F;font-size:16px;margin-top:24px;margin-bottom:8px;}';
+  content+='table{width:100%;border-collapse:collapse;margin-bottom:16px;}';
+  content+='th{background:#f5f0e8;text-align:left;padding:8px 10px;font-size:13px;border-bottom:2px solid #ddd;}';
+  content+='td{padding:6px 10px;border-bottom:1px solid #eee;font-size:13px;}';
+  content+='.total-row{font-weight:bold;background:#f9f6f0;}';
+  content+='.total-row td{border-top:2px solid #8B5E3C;color:#8B5E3C;}';
+  content+='.footer{margin-top:30px;font-size:11px;color:#999;text-align:center;border-top:1px solid #eee;padding-top:12px;}';
+  content+='</style></head><body>';
+  content+='<h1>SinPicos — Diario de comidas</h1>';
+  content+='<p style="font-size:13px;color:#666;">Generado el '+new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'</p>';
+
+  var sortedDays=Object.keys(days).sort().reverse();
+  sortedDays.forEach(function(day){
+    var items=days[day];
+    var totalHC=items.reduce(function(s,i){return s+i.hc;},0);
+    var rac=(totalHC/10).toFixed(1);
+    content+='<h2>'+formatDiarioDate(day)+'</h2>';
+    content+='<table><tr><th>Hora</th><th>Comida</th><th style="text-align:right;">HC (g)</th></tr>';
+    items.forEach(function(e){
+      content+='<tr><td>'+e.time+'</td><td>'+e.name+'</td><td style="text-align:right;">'+e.hc+'</td></tr>';
+    });
+    content+='<tr class="total-row"><td></td><td>Total del día</td><td style="text-align:right;">'+totalHC+'g ('+rac+' rac)</td></tr>';
+    content+='</table>';
+  });
+
+  content+='<div class="footer">Generado con SinPicos · sinpicos.com<br>⚠️ Estimación orientativa. Consulta siempre con tu médico.</div>';
+  content+='</body></html>';
+
+  var blob=new Blob([content],{type:'text/html'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='sinpicos-diario-'+new Date().toISOString().slice(0,10)+'.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📊 Diario exportado');
+}
+
+// ═══ AUTO-FILL DIARIO FROM PLATE ═══
+function savePlateToD(){
+  if(!plate.length) return;
+  var total=plate.reduce(function(s,i){return s+i.hc;},0);
+  var names=plate.map(function(i){return i.name;}).join(', ');
+  document.getElementById('diario-meal-hc').value=total;
+  document.getElementById('diario-meal-name').value=names.length>40?names.substring(0,37)+'...':names;
+  // Switch to diario tab
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
+  document.querySelector('[data-tab=diario]').classList.add('active');
+  document.getElementById('panel-diario').classList.add('active');
+  renderDiario();
+  showToast('📋 Datos del plato cargados en el diario');
+}
+
 // INIT
-renderDishes();renderIngredients();renderCustomDishes();renderSheet();applyTheme(getTheme());updateFotoUI();
+renderDishes();renderIngredients();renderCustomDishes();renderSheet();applyTheme(getTheme());updateFotoUI();renderDiario();
 </script>
 
 
