@@ -330,7 +330,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 .auth-sub{font-size:.72rem;color:#9C7A63;letter-spacing:2px;text-transform:uppercase;margin-bottom:32px}
 .auth-card{width:100%;max-width:360px;background:#FDFAF7;border:1px solid #E2D9CF;border-radius:24px;padding:28px 24px;box-shadow:0 2px 12px rgba(0,0,0,.04)}
 .auth-card h2{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;margin-bottom:18px;text-align:center;color:#2E1F14}
-.auth-input{width:100%;padding:14px 16px;border:1.5px solid #E2D9CF;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:#2E1F14;outline:none;background:#F7F3ED;margin-bottom:10px;min-height:48px;transition:border-color .2s}
+.auth-input{width:100%;padding:14px 16px;border:1.5px solid #E2D9CF;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:16px;color:#2E1F14;outline:none;background:#F7F3ED;margin-bottom:10px;min-height:48px;transition:border-color .2s;-webkit-appearance:none}
 .auth-input:focus{border-color:#B85C38}
 .auth-btn{width:100%;padding:15px;background:#B85C38;color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;margin-top:6px;transition:transform .1s;min-height:50px}
 .auth-btn:active{transform:scale(.97)}
@@ -409,10 +409,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
   <div class="ures" id="usearch-results" style="display:none;padding:0 14px;"></div>
 
   <div class="panel active" id="panel-platos">
-    <div class="search-wrap">
-      <span class="si">🔍</span>
-      <input type="text" id="platos-search" placeholder="Buscar plato... ej: lentejas, paella...">
-    </div>
     <div class="cat-bar" id="platos-cats">
       <button class="cat-btn active" data-cat="all">Todos</button>
       <button class="cat-btn" data-cat="primeros">🥘 Primeros</button>
@@ -426,10 +422,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
   </div>
 
   <div class="panel" id="panel-ingredientes">
-    <div class="search-wrap">
-      <span class="si">🔍</span>
-      <input type="text" id="ing-search" placeholder="Buscar alimento... ej: arroz, manzana...">
-    </div>
     <div class="cat-bar" id="ing-cats">
       <button class="cat-btn active" data-cat="all">Todos</button>
       <button class="cat-btn" data-cat="lacteos">🥛 Lácteos</button>
@@ -936,8 +928,7 @@ function renderDishes(){
 function dishHTML(d){
   return `<div class="dish-card"><div class="dish-header"><span class="dish-emoji">${d.emoji}</span><div class="dish-info"><div class="dish-name">${d.name}</div><div class="dish-desc">${d.desc}</div></div><div class="dish-right"><span class="hc-badge">${d.hc}g HC</span><span class="dish-arrow">▾</span></div></div><div class="dish-detail"><ul class="ing-list">${d.ingredients.map(i=>`<li><span class="ing-name">${i.n} (${i.g}g)</span><span class="ing-hc">${i.hc}g HC</span></li>`).join('')}</ul><button class="add-dish-btn" data-id="${d.id}">➕ Añadir al plato</button></div></div>`;
 }
-document.getElementById('platos-search').addEventListener('input',e=>{platoSearch=e.target.value.trim();platoCat='all';document.querySelectorAll('#platos-cats .cat-btn').forEach(b=>b.classList.remove('active'));document.querySelector('#platos-cats .cat-btn[data-cat="all"]').classList.add('active');renderDishes();});
-document.getElementById('platos-cats').addEventListener('click',e=>{const btn=e.target.closest('.cat-btn');if(!btn)return;platoCat=btn.dataset.cat;platoSearch='';document.getElementById('platos-search').value='';document.querySelectorAll('#platos-cats .cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderDishes();});
+document.getElementById('platos-cats').addEventListener('click',e=>{const btn=e.target.closest('.cat-btn');if(!btn)return;platoCat=btn.dataset.cat;platoSearch='';document.querySelectorAll('#platos-cats .cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderDishes();});
 
 // INGREDIENTES
 const FCAT={lacteos:'🥛 Lácteos',cereales:'🌾 Cereales, pan, pasta y tubérculos',frutas:'🍎 Frutas',hortalizas:'🥦 Hortalizas',frutos:'🥜 Frutos secos',bebidas:'🥤 Bebidas',otros:'🍕 Otros'};
@@ -984,8 +975,7 @@ function cwAdd(btn){
   const fid=btn.dataset.fid;
   document.getElementById('cwr-'+fid).textContent='—';
 }
-document.getElementById('ing-search').addEventListener('input',e=>{ingSearch=e.target.value.trim();ingCat='all';document.querySelectorAll('#ing-cats .cat-btn').forEach(b=>b.classList.remove('active'));document.querySelector('#ing-cats .cat-btn[data-cat="all"]').classList.add('active');renderIngredients();});
-document.getElementById('ing-cats').addEventListener('click',e=>{const btn=e.target.closest('.cat-btn');if(!btn)return;ingCat=btn.dataset.cat;ingSearch='';document.getElementById('ing-search').value='';document.querySelectorAll('#ing-cats .cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderIngredients();});
+document.getElementById('ing-cats').addEventListener('click',e=>{const btn=e.target.closest('.cat-btn');if(!btn)return;ingCat=btn.dataset.cat;ingSearch='';document.querySelectorAll('#ing-cats .cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderIngredients();});
 
 // MIS PLATOS - CONSTRUCTOR
 let builderItems = []; // {food, g, hc}
@@ -1151,12 +1141,28 @@ var _usI=document.getElementById('usearch-input');
 var _usR=document.getElementById('usearch-results');
 _usW.style.display='block';
 
-function usearchClear(){_usI.value='';_usR.style.display='none';_usR.innerHTML='';}
+function usearchClear(){_usI.value='';_usR.style.display='none';_usR.innerHTML='';platoSearch='';renderDishes();ingSearch='';renderIngredients();}
 function usearchAdd(name,portion,hc){addItem(name,portion,hc);usearchClear();}
 
 _usI.addEventListener('input',function(){
   var q=_usI.value.trim().toLowerCase();
-  if(!q){_usR.style.display='none';_usR.innerHTML='';return;}
+  if(!q){
+    _usR.style.display='none';_usR.innerHTML='';
+    // Reset panel filters
+    platoSearch='';renderDishes();
+    ingSearch='';renderIngredients();
+    return;
+  }
+  // Also filter the active panel
+  platoSearch=q;platoCat='all';
+  document.querySelectorAll('#platos-cats .cat-btn').forEach(b=>b.classList.remove('active'));
+  var allBtn=document.querySelector('#platos-cats .cat-btn[data-cat="all"]');if(allBtn)allBtn.classList.add('active');
+  renderDishes();
+  ingSearch=q;ingCat='all';
+  document.querySelectorAll('#ing-cats .cat-btn').forEach(b=>b.classList.remove('active'));
+  var allBtn2=document.querySelector('#ing-cats .cat-btn[data-cat="all"]');if(allBtn2)allBtn2.classList.add('active');
+  renderIngredients();
+  // Show universal results
   _usR.style.display='block';
   var dR=DISHES.filter(function(x){return x.name.toLowerCase().indexOf(q)!==-1||x.desc.toLowerCase().indexOf(q)!==-1;}).slice(0,5);
   var fR=FOODS.filter(function(x){return x.name.toLowerCase().indexOf(q)!==-1;}).slice(0,5);
