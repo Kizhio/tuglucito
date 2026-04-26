@@ -1087,7 +1087,6 @@ const SINPICOS_API_URL = 'https://sinpicos-api.ejmanosalvas.workers.dev/analyze'
 function fotoSelected(input){
   var file=input.files[0];
   if(!file)return;
-  if(file.size>4*1024*1024){alert('La imagen es demasiado grande. Máximo 4MB.');input.value='';return;}
   fotoCurrentFile=file;
 
   var reader=new FileReader();
