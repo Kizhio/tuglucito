@@ -1,7 +1,3 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YZZLP0N0LN"></script>
@@ -42,7 +38,7 @@
 }
 [data-theme="dark"] .hdr{background:#131010;}
 [data-theme="dark"] .logo{color:#F0E6DA;}
-[data-theme="dark"] .auth-user-bar{color:#F0E6DA;}
+[data-theme="dark"] .auth-user-bar{color:var(--brown-m);background:var(--cream);border-bottom-color:var(--border)}
 [data-theme="dark"] .gpt-hero{background:linear-gradient(135deg,#0A0A18 0%,#12101E 60%,#0A1830 100%);}
 
 html,body{height:100%;overflow:hidden;}
@@ -346,8 +342,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 .auth-toggle{text-align:center;margin-top:16px;font-size:.78rem;color:#9C7A63}
 .auth-toggle a{color:#B85C38;font-weight:600;cursor:pointer;text-decoration:none}
 .auth-error{background:rgba(200,60,60,.08);border:1px solid rgba(200,60,60,.2);border-radius:12px;padding:10px 14px;font-size:.78rem;color:#c44;margin-bottom:10px;display:none;text-align:center}
-.auth-user-bar{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--cream);opacity:.7}
-.auth-user-bar button{background:none;border:none;color:var(--terra-l);font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;padding:2px 6px}
+.auth-user-bar{display:flex;align-items:center;justify-content:center;gap:8px;font-size:.68rem;color:var(--brown-m);background:var(--cream);border-bottom:1px solid var(--border);padding:4px 16px;flex-shrink:0}
+.auth-user-bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+.auth-user-bar button{background:none;border:none;color:var(--terra);font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;cursor:pointer;padding:2px 6px;flex-shrink:0}
 .auth-forgot{text-align:right;margin:-4px 0 6px;font-size:.72rem}
 .auth-forgot a{color:#B85C38;cursor:pointer;text-decoration:none}
 </style>
@@ -382,7 +379,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 <div class="hdr">
   <div class="logo">Sin<span>Picos</span></div>
   <div class="hdr-right">
-    <div class="auth-user-bar" id="userBar" style="display:none"><span id="userEmail"></span><button onclick="authLogout()">Salir</button></div>
     <button id="loginBtn" onclick="showAuthScreen('Inicia sesión para sincronizar tus datos y usar Foto IA')" style="background:none;border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:5px 10px;font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;display:none">Entrar</button>
     <button class="share-btn" onclick="shareWhatsApp()" title="Compartir">📤</button>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Modo oscuro">🌙</button>
@@ -391,6 +387,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
     </button>
   </div>
 </div>
+<div class="auth-user-bar" id="userBar" style="display:none"><span id="userEmail"></span><button onclick="authLogout()">Salir</button></div>
 
 <div class="tabs">
   <button class="tab-btn active" data-tab="platos"><span class="ti">🍽️</span>Platos</button>
