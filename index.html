@@ -74,4 +74,98 @@
                 <div style="margin: 15px 0; color: #999; font-size: 12px;">O CONTINÚA CON</div>
                 
                 <button class="btn-auth btn-google" onclick="authGoogle()">
-                    <img src="
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+                    Google
+                </button>
+            </div>
+
+            <div class="auth-toggle" id="auth-toggle" onclick="toggleAuthMode()">¿No tienes cuenta? Regístrate</div>
+        </div>
+    </div>
+
+    <div id="app-content" class="hidden">
+        <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #2E1F14; color: white;">
+            <span>SinPicos</span>
+            <i class="fas fa-sign-out-alt" onclick="authLogout()" style="cursor: pointer;"></i>
+        </header>
+        
+        <main>
+            </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+            signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // CONFIGURACIÓN: Enrique, pon aquí los datos de tu proyecto de Firebase para SinPicos
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "sinpicos-app.firebaseapp.com",
+            projectId: "sinpicos-app",
+            storageBucket: "sinpicos-app.appspot.com",
+            messagingSenderId: "TU_ID",
+            appId: "TU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        let isRegisterMode = false;
+
+        // Cambiar entre Login y Registro
+        window.toggleAuthMode = () => {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('auth-title').innerText = isRegisterMode ? 'Crear cuenta' : 'Entrar en SinPicos';
+            document.getElementById('btn-submit').innerText = isRegisterMode ? 'Registrarse' : 'Entrar';
+            document.getElementById('auth-toggle').innerText = isRegisterMode ? '¿Ya tienes cuenta? Entra' : '¿No tienes cuenta? Regístrate';
+        };
+
+        // Login/Registro con Email
+        window.authSubmit = async () => {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            if(!email || !pass) return alert("Rellena todos los campos");
+
+            try {
+                if(isRegisterMode) {
+                    await createUserWithEmailAndPassword(auth, email, pass);
+                } else {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                }
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        };
+
+        // Login con Google
+        window.authGoogle = async () => {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (e) {
+                alert("Error con Google: " + e.message);
+            }
+        };
+
+        // Cerrar sesión
+        window.authLogout = () => signOut(auth);
+
+        // Observador de estado
+        onAuthStateChanged(auth, (user) => {
+            const authScreen = document.getElementById('auth-screen');
+            const appContent = document.getElementById('app-content');
+            
+            if (user) {
+                authScreen.classList.add('hidden');
+                appContent.classList.remove('hidden');
+            } else {
+                authScreen.classList.remove('hidden');
+                appContent.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
