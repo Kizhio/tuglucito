@@ -31,8 +31,6 @@
 }
 [data-theme="dark"] .hdr{background:#131010;}
 [data-theme="dark"] .gpt-hero{background:linear-gradient(135deg,#0A0A18 0%,#12101E 60%,#0A1830 100%);}
-[data-theme="dark"] .logo{color:#F7F3ED;}
-[data-theme="dark"] .logo span{color:#E8845A;}
 
 html,body{height:100%;overflow:hidden;}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown);display:flex;flex-direction:column;}
@@ -241,6 +239,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 
 .gpt-note{background:rgba(92,122,95,0.08);border:1.5px solid rgba(92,122,95,0.2);border-radius:14px;padding:13px 15px;font-size:0.8rem;color:var(--sage);line-height:1.5;font-weight:400;}
 .gpt-note strong{font-weight:600;display:block;margin-bottom:2px;color:var(--sage);}
+
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.foto-result-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;}
+.foto-result-card h3{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500;color:var(--brown);margin:0 0 12px;}
+.foto-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.85rem;}
+.foto-item:last-child{border-bottom:none;}
+.foto-item-name{color:var(--brown-m);font-weight:400;flex:1;min-width:0;}
+.foto-item-g{color:var(--brown-l);font-size:0.78rem;margin:0 8px;flex-shrink:0;}
+.foto-item-hc{color:var(--terra);font-weight:700;flex-shrink:0;}
+.foto-total{display:flex;justify-content:space-between;align-items:center;background:var(--sage);border-radius:14px;padding:14px 18px;margin:12px 0;color:white;}
+.foto-total-label{font-size:0.82rem;font-weight:500;}
+.foto-total-val{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:500;}
+.foto-total-rac{font-size:0.78rem;opacity:0.8;margin-top:2px;}
+.foto-add-all{width:100%;background:var(--terra);color:white;border:none;border-radius:14px;padding:14px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.foto-add-all:active{transform:scale(0.97);background:var(--terra-l);}
+.foto-disclaimer{font-size:0.72rem;color:var(--brown-l);text-align:center;margin-top:8px;line-height:1.4;font-weight:300;}
+.foto-error{background:rgba(200,60,60,0.08);border:1.5px solid rgba(200,60,60,0.2);border-radius:14px;padding:14px 16px;text-align:center;color:#994;font-size:0.85rem;margin-bottom:12px;}
+
 </style>
 </head>
 <body>
@@ -261,6 +278,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
   <button class="tab-btn" data-tab="ingredientes"><span class="ti">🥦</span>Ingredientes</button>
   <button class="tab-btn" data-tab="misplatos"><span class="ti">⭐</span>Mis platos</button>
   <button class="tab-btn" data-tab="foto"><span class="ti">📸</span>Foto</button>
+  <button class="tab-btn" data-tab="pro" id="tab-pro"><span class="ti">👑</span>Pro</button>
 </div>
 
 <div class="scroll-area">
@@ -344,51 +362,136 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 
     <div class="gpt-hero">
       <div class="gpt-hero-icon">📸</div>
-      <h2>Analiza tu plato con una foto</h2>
-      <p>Haz una foto de lo que vas a comer y la IA de chatGPT te dirá los hidratos de carbono estimados usando las tablas de tu médico.</p>
-      <div class="free-badge">🆓 Gratis · Sin suscripción de pago</div>
+      <h2>Analiza tu plato con IA</h2>
+      <p>Haz una foto de tu comida y la IA calculará los hidratos de carbono en segundos.</p>
+      <div class="free-badge" id="foto-badge">🆓 Free · 2 fotos/día</div>
     </div>
 
-    <a class="gpt-btn" href="https://chatgpt.com/g/g-69c3e7741bec81919b1f897da4a6df0f-sinpicos" target="_blank">
-      <span>Abrir asistente SinPicos</span>
-      <span class="gpt-arrow">→</span>
-    </a>
+    <!-- Zona de foto -->
+    <div id="foto-upload-zone" style="background:var(--cream);border:2px dashed var(--border);border-radius:18px;padding:30px 16px;text-align:center;margin-bottom:16px;cursor:pointer;transition:all 0.2s;" onclick="document.getElementById('foto-input').click()">
+      <div id="foto-preview-wrap" style="display:none;margin-bottom:12px;">
+        <img id="foto-preview" style="max-width:100%;max-height:260px;border-radius:14px;object-fit:cover;">
+      </div>
+      <div id="foto-placeholder">
+        <div style="font-size:2.8rem;margin-bottom:8px;">📷</div>
+        <div style="font-size:0.92rem;font-weight:500;color:var(--brown);">Pulsa para hacer o elegir una foto</div>
+        <div style="font-size:0.78rem;color:var(--brown-l);margin-top:4px;">JPG, PNG · Máximo 4MB</div>
+      </div>
+      <input type="file" id="foto-input" accept="image/*" capture="environment" style="display:none;" onchange="fotoSelected(this)">
+    </div>
 
-    <div class="steps-card">
-      <h3>¿Cómo funciona?</h3>
-      <div class="step-row">
-        <div class="step-num">1</div>
-        <div class="step-txt">
-          <strong>Descarga ChatGPT</strong>
-          <span>Busca «ChatGPT» en App Store o Google Play e instálala. Es gratis.</span>
+    <button class="gpt-btn" id="foto-analyze-btn" onclick="fotoAnalyze()" style="display:none;">
+      <span>🔍 Analizar hidratos</span>
+    </button>
+
+    <!-- Loading -->
+    <div id="foto-loading" style="display:none;text-align:center;padding:24px;">
+      <div style="font-size:2rem;animation:spin 1.2s linear infinite;">⏳</div>
+      <div style="font-size:0.88rem;color:var(--brown-m);margin-top:10px;">Analizando tu plato...</div>
+    </div>
+
+    <!-- Resultado IA -->
+    <div id="foto-result" style="display:none;"></div>
+
+    <!-- Contador de usos -->
+    <div class="gpt-note" id="foto-counter-note">
+      <strong id="foto-counter-title">📸 Usos de hoy</strong>
+      <span id="foto-counter-text"></span>
+    </div>
+
+    <!-- Banner upgrade Pro -->
+    <div id="foto-pro-banner" style="display:none;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);border-radius:18px;padding:22px 20px;margin-top:14px;text-align:center;color:white;">
+      <div style="font-size:1.8rem;margin-bottom:8px;">⭐</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:500;margin-bottom:6px;">SinPicos Pro</div>
+      <div style="font-size:0.82rem;opacity:0.85;line-height:1.5;margin-bottom:14px;">15 fotos/día · Platos ilimitados · Diario de comidas · Exportar PDF</div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="activatePro('monthly')" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;border-radius:12px;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;">2,99€/mes</button>
+        <button onclick="activatePro('yearly')" style="background:white;border:none;color:#1a1a2e;border-radius:12px;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;">⭐ 29,99€/año</button>
+      </div>
+      <div style="font-size:0.7rem;opacity:0.6;margin-top:10px;">El pago se integrará próximamente</div>
+    </div>
+
+  </div>
+
+  <!-- PANEL 5: PRO -->
+  <div class="panel" id="panel-pro">
+
+    <!-- Hero -->
+    <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);border-radius:20px;padding:28px 22px;text-align:center;color:white;margin-bottom:18px;">
+      <div style="font-size:3rem;margin-bottom:10px;">👑</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:500;margin-bottom:6px;">SinPicos Pro</div>
+      <div style="font-size:0.85rem;opacity:0.85;line-height:1.6;">Todo lo que necesitas para controlar tus hidratos sin complicaciones.</div>
+      <div id="pro-status-badge" style="display:inline-block;margin-top:12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:5px 14px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px;"></div>
+    </div>
+
+    <!-- Comparativa -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+
+      <!-- Free column -->
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:16px 14px;">
+        <div style="font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--brown-l);margin-bottom:4px;">Free</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500;color:var(--brown);margin-bottom:12px;">0€</div>
+        <div style="font-size:0.78rem;color:var(--brown-m);line-height:1.8;">
+          ✓ +80 platos españoles<br>
+          ✓ +70 ingredientes<br>
+          ✓ Plato acumulador<br>
+          ✓ Búsqueda universal<br>
+          ✓ Compartir WhatsApp<br>
+          ✓ Modo oscuro<br>
+          <span style="color:var(--terra);">📸 2 fotos IA / día</span><br>
+          <span style="color:var(--brown-l);">⊘ Máx. 3 platos propios</span><br>
+          <span style="color:var(--brown-l);">⊘ Sin historial</span><br>
+          <span style="color:var(--brown-l);">⊘ Sin exportar PDF</span>
         </div>
       </div>
-      <div class="step-row">
-        <div class="step-num">2</div>
-        <div class="step-txt">
-          <strong>Crea una cuenta gratuita</strong>
-          <span>Solo necesitas un correo electrónico. No hace falta ningún pago.</span>
-        </div>
-      </div>
-      <div class="step-row">
-        <div class="step-num">3</div>
-        <div class="step-txt">
-          <strong>Pulsa «Abrir asistente SinPicos»</strong>
-          <span>El botón de arriba te lleva directamente al asistente ya configurado con las guías de tu médico.</span>
-        </div>
-      </div>
-      <div class="step-row">
-        <div class="step-num">4</div>
-        <div class="step-txt">
-          <strong>Haz una foto de tu plato</strong>
-          <span>Pulsa el icono 📎 dentro del chat, selecciona la foto y envíala. El asistente calculará los hidratos en segundos.</span>
+
+      <!-- Pro column -->
+      <div style="background:var(--white);border:2px solid var(--gold);border-radius:16px;padding:16px 14px;position:relative;">
+        <div style="position:absolute;top:-10px;right:12px;background:var(--gold);color:white;font-size:0.65rem;font-weight:700;padding:3px 10px;border-radius:10px;letter-spacing:0.5px;">RECOMENDADO</div>
+        <div style="font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:4px;">Pro</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500;color:var(--brown);margin-bottom:12px;">29,99€<span style="font-size:0.7rem;font-weight:400;color:var(--brown-l);">/año</span></div>
+        <div style="font-size:0.78rem;color:var(--brown-m);line-height:1.8;">
+          ✓ Todo lo de Free<br>
+          <strong style="color:var(--terra);">📸 15 fotos IA / día</strong><br>
+          <strong>⭐ Platos ilimitados</strong><br>
+          <strong>📋 Diario de comidas</strong><br>
+          <strong>💉 Calculadora de bolo</strong><br>
+          <strong>📊 Exportar PDF/Excel</strong><br>
+          <strong>📦 +500 alimentos</strong><br>
+          <strong>☁️ Backup en la nube</strong><br>
+          <strong>📱 Widget pantalla</strong><br>
+          <strong>🔔 Sin publicidad</strong>
         </div>
       </div>
     </div>
 
-    <div class="gpt-note">
-      <strong>✅ No necesitas ChatGPT de pago</strong>
-      La versión gratuita de ChatGPT es suficiente para usar este asistente. No tendrás que introducir ningún número de tarjeta.
+    <!-- Botones de compra -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+      <button onclick="activatePro('monthly')" style="width:100%;background:var(--sage);color:white;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
+        Suscribirme por 2,99€/mes
+      </button>
+      <button onclick="activatePro('yearly')" style="width:100%;background:var(--gold);color:white;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
+        ⭐ Suscribirme por 29,99€/año
+      </button>
+    </div>
+
+    <!-- Info -->
+    <div style="background:rgba(92,122,95,0.08);border:1.5px solid rgba(92,122,95,0.2);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
+      <div style="font-size:0.82rem;color:var(--sage);line-height:1.6;">
+        <strong style="display:block;margin-bottom:4px;">💰 ¿Por qué 29,99€/año?</strong>
+        Son solo 2,50€ al mes — menos que un café. La IA analiza tu comida en cada plato, y mantener ese servicio tiene un coste. Tu suscripción financia directamente la tecnología que te ahorra tiempo cada día.
+      </div>
+    </div>
+
+    <div style="background:rgba(196,154,44,0.08);border:1.5px solid rgba(196,154,44,0.2);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
+      <div style="font-size:0.82rem;color:var(--brown-m);line-height:1.6;">
+        <strong style="display:block;margin-bottom:4px;">🔄 Cancela cuando quieras</strong>
+        Sin permanencia. Si no te convence, cancelas y sigues usando la versión Free sin perder tus datos.
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:8px;font-size:0.72rem;color:var(--brown-l);line-height:1.5;">
+      El pago se integrará próximamente.<br>Ahora puedes probar Pro pulsando el botón.
     </div>
 
   </div>
@@ -894,8 +997,204 @@ _usI.addEventListener('input',function(){
   });
 });
 
+// ═══ FOTO IA + FREE/PRO SYSTEM ═══
+
+// --- Plan & Usage ---
+function getPlan(){return localStorage.getItem('sp_plan')||'free';}
+function setPlan(p){localStorage.setItem('sp_plan',p);}
+function getMaxFotos(){return getPlan()==='pro'?15:2;}
+
+function getTodayKey(){return 'sp_fotos_'+new Date().toISOString().slice(0,10);}
+function getFotoCount(){return parseInt(localStorage.getItem(getTodayKey())||'0');}
+function incFotoCount(){const c=getFotoCount()+1;localStorage.setItem(getTodayKey(),c);return c;}
+function canUseFoto(){return getFotoCount()<getMaxFotos();}
+
+function updateFotoUI(){
+  const plan=getPlan();
+  const used=getFotoCount();
+  const max=getMaxFotos();
+  const remaining=Math.max(0,max-used);
+  const badge=document.getElementById('foto-badge');
+  const counterText=document.getElementById('foto-counter-text');
+  const counterTitle=document.getElementById('foto-counter-title');
+  const proBanner=document.getElementById('foto-pro-banner');
+  const proStatus=document.getElementById('pro-status-badge');
+  const tabPro=document.getElementById('tab-pro');
+
+  if(plan==='pro'){
+    badge.textContent='⭐ Pro · 15 fotos/día';
+    badge.style.background='rgba(196,154,44,0.2)';
+    badge.style.border='1px solid rgba(196,154,44,0.4)';
+    badge.style.color='#c49a2c';
+    proBanner.style.display='none';
+    if(proStatus)proStatus.textContent='✅ PLAN ACTIVO';
+    if(tabPro){tabPro.style.background='rgba(196,154,44,0.15)';tabPro.style.color='var(--gold)';}
+  } else {
+    badge.textContent='🆓 Free · 2 fotos/día';
+    proBanner.style.display=(used>=max)?'block':'none';
+    if(proStatus)proStatus.textContent='PLAN GRATUITO';
+    if(tabPro){tabPro.style.background='';tabPro.style.color='';}
+  }
+  counterTitle.textContent='📸 Usos de hoy';
+  counterText.textContent=' — Has usado '+used+' de '+max+' análisis. '+(remaining>0?'Te quedan '+remaining+'.':'Ya no te quedan análisis hoy.');
+
+  // Disable upload if no remaining
+  const zone=document.getElementById('foto-upload-zone');
+  if(!canUseFoto()){
+    zone.style.opacity='0.5';
+    zone.style.pointerEvents='none';
+  } else {
+    zone.style.opacity='1';
+    zone.style.pointerEvents='auto';
+  }
+}
+
+function activatePro(type){
+  // Placeholder — aquí se integrará Stripe/RevenueCat/etc.
+  setPlan('pro');
+  updateFotoUI();
+  showToast('⭐ Plan Pro activado');
+}
+
+// --- Foto handling ---
+let fotoBase64=null;
+let fotoCurrentFile=null;
+
+function fotoResizeImage(file, maxDim) {
+  return new Promise(function(resolve) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+          else { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+const SINPICOS_API_URL = 'https://sinpicos-api.ejmanosalvas.workers.dev/analyze';
+
+function fotoSelected(input){
+  var file=input.files[0];
+  if(!file)return;
+  if(file.size>4*1024*1024){alert('La imagen es demasiado grande. Máximo 4MB.');input.value='';return;}
+  fotoCurrentFile=file;
+
+  var reader=new FileReader();
+  reader.onload=function(e){
+    fotoBase64=e.target.result;
+    document.getElementById('foto-preview').src=fotoBase64;
+    document.getElementById('foto-preview-wrap').style.display='block';
+    document.getElementById('foto-placeholder').style.display='none';
+    document.getElementById('foto-result').style.display='none';
+    document.getElementById('foto-result').innerHTML='';
+
+    var btn=document.getElementById('foto-analyze-btn');
+    if(!canUseFoto()){
+      btn.style.display='flex';
+      btn.disabled=true;
+      btn.querySelector('span').textContent='🚫 Sin análisis disponibles hoy';
+    } else {
+      btn.style.display='flex';
+      btn.disabled=false;
+      btn.querySelector('span').textContent='🔍 Analizar hidratos';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function fotoAnalyze(){
+  if(!fotoCurrentFile){alert('Selecciona una foto primero');return;}
+  if(!canUseFoto()){
+    showToast('❌ Has agotado tus análisis de hoy');
+    updateFotoUI();
+    return;
+  }
+
+  var btn=document.getElementById('foto-analyze-btn');
+  btn.disabled=true;
+  btn.querySelector('span').innerHTML='<span style="display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:8px;"></span>Analizando...';
+  document.getElementById('foto-loading').style.display='none';
+  document.getElementById('foto-result').style.display='none';
+  document.getElementById('foto-result').innerHTML='';
+
+  try{
+    var base64=await fotoResizeImage(fotoCurrentFile, 800);
+    var res=await fetch(SINPICOS_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:base64})});
+    var data=await res.json();
+
+    if(data.error){throw new Error(data.error);}
+
+    incFotoCount();
+    updateFotoUI();
+    renderFotoResult(data);
+
+    btn.disabled=false;
+    btn.querySelector('span').textContent='📸 Analizar otra foto';
+
+  }catch(err){
+    console.error('Foto AI error:',err);
+    document.getElementById('foto-result').style.display='block';
+    document.getElementById('foto-result').innerHTML='<div class="foto-error">❌ Error: '+(err.message||'Error de conexión')+'<br><span style="font-size:0.78rem;">Comprueba tu internet e inténtalo de nuevo.</span></div>';
+    btn.disabled=false;
+    btn.querySelector('span').textContent='🔍 Reintentar';
+  }
+}
+
+function renderFotoResult(r){
+  const el=document.getElementById('foto-result');
+  el.style.display='block';
+
+  let itemsHTML=r.items.map(i=>
+    `<div class="foto-item">
+      <span class="foto-item-name">${i.name}</span>
+      <span class="foto-item-g">${i.g}g</span>
+      <span class="foto-item-hc">${i.hc}g HC</span>
+    </div>`
+  ).join('');
+
+  el.innerHTML=`
+    <div class="foto-result-card">
+      <h3>🍽️ Resultado del análisis</h3>
+      ${itemsHTML}
+    </div>
+    <div class="foto-total">
+      <div>
+        <div class="foto-total-label">Total hidratos</div>
+        <div class="foto-total-rac">${r.raciones} raciones · 1 ración = 10g HC</div>
+      </div>
+      <div class="foto-total-val">${r.total_hc}g</div>
+    </div>
+    ${r.nota?`<div class="gpt-note" style="margin-bottom:12px;"><strong>💡 Nota</strong>${r.nota}</div>`:''}
+    <button class="foto-add-all" onclick="fotoAddAll()">➕ Añadir todo al plato</button>
+    <div class="foto-disclaimer">⚠️ Estimación orientativa basada en IA. Consulta siempre con tu médico.</div>
+  `;
+
+  // Store for adding to plate
+  window._fotoItems=r.items;
+  window._fotoTotal=r.total_hc;
+}
+
+function fotoAddAll(){
+  if(!window._fotoItems)return;
+  window._fotoItems.forEach(i=>{
+    if(i.hc>0) addItem(i.name,i.g+'g (foto IA)',i.hc);
+  });
+  showToast('✅ Añadido al plato desde foto');
+}
+
 // INIT
-renderDishes();renderIngredients();renderCustomDishes();renderSheet();applyTheme(getTheme());
+renderDishes();renderIngredients();renderCustomDishes();renderSheet();applyTheme(getTheme());updateFotoUI();
 </script>
 
 
