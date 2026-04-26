@@ -1,5 +1,7 @@
 
 
+
+
 <!DOCTYPE html>
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YZZLP0N0LN"></script>
@@ -278,6 +280,52 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 .promo-msg.ok{display:block;background:rgba(92,122,95,0.1);color:var(--sage);}
 .promo-msg.err{display:block;background:rgba(200,60,60,0.08);color:#c44;}
 
+/* ─── PRO: DIARY ─── */
+.diary-day{background:var(--white);border:1.5px solid var(--border);border-radius:16px;margin-bottom:10px;overflow:hidden}
+.diary-day-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer}
+.diary-day-hdr .dd-date{font-size:.88rem;font-weight:600;color:var(--brown)}
+.diary-day-hdr .dd-hc{font-size:.85rem;font-weight:700;color:var(--terra);background:var(--terra-bg);padding:3px 10px;border-radius:10px}
+.diary-day-hdr .dd-arrow{font-size:.75rem;color:var(--brown-l);transition:transform .2s}
+.diary-day.open .dd-arrow{transform:rotate(180deg)}
+.diary-day-body{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
+.diary-day.open .diary-day-body{display:block}
+.diary-item{display:flex;justify-content:space-between;padding:6px 0;font-size:.82rem;border-bottom:1px solid var(--border)}
+.diary-item:last-child{border:none}
+.diary-item .di-name{color:var(--brown-m);flex:1}
+.diary-item .di-hc{color:var(--terra);font-weight:600}
+.diary-empty{text-align:center;padding:32px;color:var(--brown-l);font-size:.85rem}
+
+/* ─── PRO: CHART ─── */
+.chart-wrap{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px}
+.chart-wrap h3{font-family:'Fraunces',serif;font-size:1rem;font-weight:500;margin-bottom:16px;color:var(--brown)}
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:140px;padding:0 2px}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.chart-bar{width:100%;border-radius:6px 6px 3px 3px;background:var(--terra);min-height:2px;transition:height .5s ease}
+.chart-val{font-size:.6rem;font-weight:700;color:var(--terra)}
+.chart-lbl{font-size:.58rem;color:var(--brown-l);font-weight:500;text-transform:uppercase}
+.chart-avg{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.chart-avg-item{flex:1;min-width:70px;background:var(--cream);border-radius:12px;padding:10px;text-align:center}
+.chart-avg-item .ca-val{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500;color:var(--terra);display:block}
+.chart-avg-item .ca-lbl{font-size:.6rem;color:var(--brown-l);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;display:block}
+
+/* ─── PRO: FAVORITES ─── */
+.fav-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.fav-chip{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:10px 14px;font-size:.82rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.fav-chip:active{transform:scale(.96);border-color:var(--terra)}
+.fav-chip .fav-hc{font-weight:700;color:var(--terra);font-size:.78rem}
+.fav-chip .fav-rm{font-size:.9rem;color:var(--brown-l);margin-left:4px}
+.fav-empty{font-size:.82rem;color:var(--brown-l);text-align:center;padding:16px}
+
+/* ─── PRO LOCK OVERLAY ─── */
+.pro-gate{position:relative}
+.pro-gate::after{content:'';position:absolute;inset:0;background:rgba(247,243,237,.7);border-radius:inherit;z-index:2;pointer-events:none}
+[data-theme="dark"] .pro-gate::after{background:rgba(26,20,16,.7)}
+.pro-gate-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;background:var(--gold);color:white;padding:10px 20px;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(196,154,44,.25);white-space:nowrap}
+
+/* ─── OFFLINE INDICATOR ─── */
+.offline-bar{position:fixed;top:0;left:0;right:0;background:#c44;color:white;text-align:center;font-size:.72rem;font-weight:600;padding:4px;z-index:999;display:none}
+.offline-bar.show{display:block}
+
 /* ─── AUTH SCREEN ─── */
 .auth-screen{position:fixed;inset:0;z-index:500;background:#F7F3ED;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .4s,visibility .4s}
 .auth-screen.gone{opacity:0;visibility:hidden;pointer-events:none}
@@ -306,23 +354,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
-<div class="auth-screen" id="authScreen">
+<!-- OFFLINE BAR -->
+<div class="offline-bar" id="offlineBar">📵 Sin conexión — los datos se guardan en tu dispositivo</div>
+
+<!-- AUTH SCREEN (hidden by default) -->
+<div class="auth-screen gone" id="authScreen">
   <div class="auth-logo">Sin<span>Picos</span></div>
   <div class="auth-sub">hidratos fácil</div>
   <div class="auth-card">
-    <h2 id="authTitle">Iniciar sesión</h2>
+    <h2 id="authTitle">Crear cuenta</h2>
+    <p id="authReason" style="font-size:.78rem;color:var(--brown-m);text-align:center;margin-bottom:14px;line-height:1.4;display:none"></p>
     <div class="auth-error" id="authError"></div>
     <input class="auth-input" id="authEmail" type="email" placeholder="Correo electrónico" autocomplete="email">
-    <input class="auth-input" id="authPass" type="password" placeholder="Contraseña" autocomplete="current-password">
-    <div class="auth-forgot" id="authForgot"><a onclick="resetPassword()">¿Olvidaste tu contraseña?</a></div>
-    <button class="auth-btn" id="authBtn" onclick="authSubmit()">Entrar</button>
+    <input class="auth-input" id="authPass" type="password" placeholder="Contraseña" autocomplete="new-password">
+    <div class="auth-forgot" id="authForgot" style="display:none"><a onclick="resetPassword()">¿Olvidaste tu contraseña?</a></div>
+    <button class="auth-btn" id="authBtn" onclick="authSubmit()">Crear cuenta</button>
     <div class="auth-divider">o continúa con</div>
     <button class="auth-google" onclick="authGoogle()">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.93 23.93 0 000 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Google
     </button>
-    <div class="auth-toggle" id="authToggle">¿No tienes cuenta? <a onclick="toggleAuthMode()">Regístrate</a></div>
+    <div class="auth-toggle" id="authToggle">¿Ya tienes cuenta? <a onclick="toggleAuthMode()">Inicia sesión</a></div>
+    <button onclick="closeAuthScreen()" style="width:100%;padding:12px;background:none;border:none;color:var(--brown-l);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;margin-top:10px">Seguir sin cuenta</button>
   </div>
 </div>
 
@@ -330,6 +383,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
   <div class="logo">Sin<span>Picos</span></div>
   <div class="hdr-right">
     <div class="auth-user-bar" id="userBar" style="display:none"><span id="userEmail"></span><button onclick="authLogout()">Salir</button></div>
+    <button id="loginBtn" onclick="showAuthScreen('Inicia sesión para sincronizar tus datos y usar Foto IA')" style="background:none;border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:5px 10px;font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;display:none">Entrar</button>
     <button class="share-btn" onclick="shareWhatsApp()" title="Compartir">📤</button>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Modo oscuro">🌙</button>
     <button class="plate-fab" id="fab" onclick="openSheet()">
@@ -343,6 +397,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
   <button class="tab-btn" data-tab="ingredientes"><span class="ti">🥦</span>Ingredientes</button>
   <button class="tab-btn" data-tab="misplatos"><span class="ti">⭐</span>Mis platos</button>
   <button class="tab-btn" data-tab="foto"><span class="ti">📸</span>Foto</button>
+  <button class="tab-btn" data-tab="diario"><span class="ti">📋</span>Diario</button>
   <button class="tab-btn" data-tab="pro" id="tab-pro"><span class="ti">👑</span>Pro</button>
 </div>
 
@@ -468,7 +523,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
     <div id="foto-pro-banner" style="display:none;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);border-radius:18px;padding:22px 20px;margin-top:14px;text-align:center;color:white;">
       <div style="font-size:1.8rem;margin-bottom:8px;">⭐</div>
       <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:500;margin-bottom:6px;">SinPicos Pro</div>
-      <div style="font-size:0.82rem;opacity:0.85;line-height:1.5;margin-bottom:14px;">15 fotos/día · Platos ilimitados · Diario de comidas · Exportar PDF</div>
+      <div style="font-size:0.82rem;opacity:0.85;line-height:1.5;margin-bottom:14px;">15 fotos/día · Diario · Gráficas · Calculadora FSI · PDF</div>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
         <button onclick="activatePro('monthly')" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;border-radius:12px;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;">2,99€/mes</button>
         <button onclick="activatePro('yearly')" style="background:white;border:none;color:#1a1a2e;border-radius:12px;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;">⭐ 29,99€/año</button>
@@ -478,6 +533,76 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 
   </div>
 
+  <!-- PANEL: DIARIO DE COMIDAS (PRO) -->
+  <div class="panel" id="panel-diario">
+    <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:500;color:var(--brown);margin-bottom:6px">📋 Diario de comidas</div>
+    <div style="font-size:.78rem;color:var(--brown-l);margin-bottom:14px">Tu historial de hidratos día a día</div>
+
+    <!-- Favorites quick access -->
+    <div style="font-size:.68rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--brown-m);margin-bottom:6px">⭐ Favoritos</div>
+    <div id="fav-list" class="fav-grid"></div>
+
+    <!-- Weekly chart -->
+    <div id="diary-chart"></div>
+
+    <!-- FSI Calculator -->
+    <div id="fsi-calc" class="form-card" style="margin-bottom:14px">
+      <div style="font-size:.68rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--brown-m);margin-bottom:10px">🧮 Factor de Sensibilidad a la Insulina</div>
+      <div style="font-size:.75rem;color:var(--brown-l);line-height:1.5;margin-bottom:14px">Introduce tu dosis diaria total de insulina (DDT) que te ha indicado tu médico. Se calcula con la <strong>regla del 1800</strong> (rápida) o <strong>1500</strong> (regular).</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <div style="flex:1">
+          <label class="flabel">DDT (unidades/día)</label>
+          <input class="finput" id="fsi-ddt" type="number" inputmode="numeric" placeholder="Ej: 40" style="margin-bottom:0" oninput="calcFSI()">
+        </div>
+        <div style="flex:1">
+          <label class="flabel">Tipo insulina</label>
+          <select class="finput" id="fsi-type" style="margin-bottom:0;-webkit-appearance:menulist" onchange="calcFSI()">
+            <option value="1800">Rápida (1800)</option>
+            <option value="1500">Regular (1500)</option>
+          </select>
+        </div>
+      </div>
+      <div id="fsi-result" style="display:none;background:var(--sage);border-radius:14px;padding:16px;color:white;text-align:center;margin-bottom:10px">
+        <div style="font-size:.72rem;opacity:.8;text-transform:uppercase;letter-spacing:.5px">Tu factor de sensibilidad</div>
+        <div style="font-family:'Fraunces',serif;font-size:2rem;font-weight:500;margin:4px 0" id="fsi-value">—</div>
+        <div style="font-size:.78rem;opacity:.85" id="fsi-desc">—</div>
+      </div>
+      <div id="fsi-plate-calc" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <div style="flex:1">
+            <label class="flabel">Ratio I:HC (tu médico)</label>
+            <input class="finput" id="fsi-ratio" type="number" inputmode="decimal" placeholder="Ej: 10" style="margin-bottom:0" oninput="calcFSI()">
+          </div>
+          <div style="flex:1">
+            <label class="flabel">HC del plato actual</label>
+            <div class="finput" id="fsi-plate-hc" style="margin-bottom:0;background:var(--terra-bg);color:var(--terra);font-weight:700;display:flex;align-items:center">—</div>
+          </div>
+        </div>
+        <div id="fsi-dose-result" style="display:none;background:var(--terra-bg);border:1.5px solid rgba(184,92,56,.2);border-radius:14px;padding:14px;text-align:center">
+          <div style="font-size:.72rem;color:var(--terra);text-transform:uppercase;letter-spacing:.5px">Raciones para este plato</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:500;color:var(--terra);margin:4px 0" id="fsi-dose-val">—</div>
+          <div style="font-size:.72rem;color:var(--brown-l)" id="fsi-dose-explain">—</div>
+        </div>
+      </div>
+      <div style="font-size:.68rem;color:var(--brown-l);margin-top:10px;line-height:1.4;text-align:center">⚠️ Herramienta orientativa. <strong>Consulta siempre con tu médico</strong> antes de ajustar cualquier dosis de insulina.</div>
+    </div>
+
+    <!-- Export PDF button -->
+    <button id="export-pdf-btn" onclick="exportPDF()" style="width:100%;background:var(--sage);color:white;border:none;border-radius:14px;padding:14px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;margin-bottom:14px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px">📊 Exportar resumen (PDF)</button>
+
+    <!-- Day list -->
+    <div style="font-size:.68rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--brown-m);margin-bottom:8px">Historial</div>
+    <div id="diary-list"></div>
+
+    <!-- Pro gate overlay if not pro -->
+    <div id="diary-gate" style="display:none;text-align:center;padding:40px 16px">
+      <div style="font-size:2.5rem;margin-bottom:12px">🔒</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500;margin-bottom:8px;color:var(--brown)">Función Pro</div>
+      <div style="font-size:.82rem;color:var(--brown-l);margin-bottom:16px;line-height:1.5">El diario de comidas, gráficas, favoritos, calculadora FSI y exportar PDF son funciones de SinPicos Pro.</div>
+      <button onclick="document.querySelector('[data-tab=pro]').click()" style="background:var(--gold);color:white;border:none;border-radius:14px;padding:14px 28px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer">👑 Ver planes Pro</button>
+    </div>
+  </div>
+
   <!-- PANEL 5: PRO -->
   <div class="panel" id="panel-pro">
 
@@ -485,11 +610,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
     <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);border-radius:20px;padding:28px 22px;text-align:center;color:white;margin-bottom:18px;">
       <div style="font-size:3rem;margin-bottom:10px;">👑</div>
       <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:500;margin-bottom:6px;">SinPicos Pro</div>
-      <div style="font-size:0.85rem;opacity:0.85;line-height:1.6;">Todo lo que necesitas para controlar tus hidratos sin complicaciones.</div>
+      <div style="font-size:0.85rem;opacity:0.85;line-height:1.6;">Herramientas avanzadas para controlar tus hidratos con precisión.</div>
       <div id="pro-status-badge" style="display:inline-block;margin-top:12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:5px 14px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px;"></div>
     </div>
 
-    <!-- Comparativa -->
+    <!-- Comparativa HONESTA -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
 
       <!-- Free column -->
@@ -500,13 +625,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
           ✓ +80 platos españoles<br>
           ✓ +70 ingredientes<br>
           ✓ Plato acumulador<br>
+          ✓ Mis platos propios<br>
           ✓ Búsqueda universal<br>
           ✓ Compartir WhatsApp<br>
           ✓ Modo oscuro<br>
-          <span style="color:var(--terra);">📸 2 fotos IA / día</span><br>
-          <span style="color:var(--brown-l);">⊘ Máx. 3 platos propios</span><br>
-          <span style="color:var(--brown-l);">⊘ Sin historial</span><br>
-          <span style="color:var(--brown-l);">⊘ Sin exportar PDF</span>
+          <span style="color:var(--terra);">📸 2 fotos IA / día</span>
         </div>
       </div>
 
@@ -518,14 +641,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
         <div style="font-size:0.78rem;color:var(--brown-m);line-height:1.8;">
           ✓ Todo lo de Free<br>
           <strong style="color:var(--terra);">📸 15 fotos IA / día</strong><br>
-          <strong>⭐ Platos ilimitados</strong><br>
           <strong>📋 Diario de comidas</strong><br>
-          <strong>💉 Calculadora de bolo</strong><br>
-          <strong>📊 Exportar PDF/Excel</strong><br>
-          <strong>📦 +500 alimentos</strong><br>
-          <strong>☁️ Backup en la nube</strong><br>
-          <strong>📱 Widget pantalla</strong><br>
-          <strong>🔔 Sin publicidad</strong>
+          <strong>📈 Gráfica semanal HC</strong><br>
+          <strong>⭐ Platos favoritos</strong><br>
+          <strong>📊 Exportar PDF</strong><br>
+          <strong>🧮 Calculadora FSI</strong><br>
+          <strong>📱 Modo offline</strong>
         </div>
       </div>
     </div>
@@ -544,7 +665,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
     <div style="background:rgba(92,122,95,0.08);border:1.5px solid rgba(92,122,95,0.2);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
       <div style="font-size:0.82rem;color:var(--sage);line-height:1.6;">
         <strong style="display:block;margin-bottom:4px;">💰 ¿Por qué 29,99€/año?</strong>
-        Son solo 2,50€ al mes — menos que un café. La IA analiza tu comida en cada plato, y mantener ese servicio tiene un coste. Tu suscripción financia directamente la tecnología que te ahorra tiempo cada día.
+        Son solo 2,50€ al mes — menos que un café. La IA analiza tu comida con cada foto, y el diario, gráficas y exportación requieren mantener servidores. Tu suscripción financia directamente la tecnología que usas cada día.
       </div>
     </div>
 
@@ -999,6 +1120,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  if(btn.dataset.tab==='diario')renderDiary();
 }));
 
 
@@ -1145,31 +1267,35 @@ function updateFotoUI(){
   const proStatus=document.getElementById('pro-status-badge');
   const tabPro=document.getElementById('tab-pro');
 
-  if(plan==='pro'){
+  if(typeof currentUser!=='undefined'&&!currentUser){
+    badge.textContent='🔑 Crea cuenta gratis para usar';
+    badge.style.background='rgba(255,255,255,0.15)';badge.style.border='1px solid rgba(255,255,255,0.3)';badge.style.color='white';
+    proBanner.style.display='none';
+    if(proStatus)proStatus.textContent='PLAN GRATUITO';
+    counterTitle.textContent='📸 Análisis con IA';
+    counterText.textContent=' — Crea una cuenta gratuita para analizar tus platos con foto.';
+  } else if(plan==='pro'){
     badge.textContent='⭐ Pro · 15 fotos/día';
-    badge.style.background='rgba(196,154,44,0.2)';
-    badge.style.border='1px solid rgba(196,154,44,0.4)';
-    badge.style.color='#c49a2c';
+    badge.style.background='rgba(196,154,44,0.2)';badge.style.border='1px solid rgba(196,154,44,0.4)';badge.style.color='#c49a2c';
     proBanner.style.display='none';
     if(proStatus)proStatus.textContent='✅ PLAN ACTIVO';
     if(tabPro){tabPro.style.background='rgba(196,154,44,0.15)';tabPro.style.color='var(--gold)';}
+    counterTitle.textContent='📸 Usos de hoy';
+    counterText.textContent=' — Has usado '+used+' de '+max+' análisis. '+(remaining>0?'Te quedan '+remaining+'.':'Ya no te quedan análisis hoy.');
   } else {
     badge.textContent='🆓 Free · 2 fotos/día';
     proBanner.style.display=(used>=max)?'block':'none';
     if(proStatus)proStatus.textContent='PLAN GRATUITO';
     if(tabPro){tabPro.style.background='';tabPro.style.color='';}
+    counterTitle.textContent='📸 Usos de hoy';
+    counterText.textContent=' — Has usado '+used+' de '+max+' análisis. '+(remaining>0?'Te quedan '+remaining+'.':'Ya no te quedan análisis hoy.');
   }
-  counterTitle.textContent='📸 Usos de hoy';
-  counterText.textContent=' — Has usado '+used+' de '+max+' análisis. '+(remaining>0?'Te quedan '+remaining+'.':'Ya no te quedan análisis hoy.');
 
-  // Disable upload if no remaining
   const zone=document.getElementById('foto-upload-zone');
-  if(!canUseFoto()){
-    zone.style.opacity='0.5';
-    zone.style.pointerEvents='none';
+  if(typeof currentUser!=='undefined'&&currentUser&&!canUseFoto()){
+    zone.style.opacity='0.5';zone.style.pointerEvents='none';
   } else {
-    zone.style.opacity='1';
-    zone.style.pointerEvents='auto';
+    zone.style.opacity='1';zone.style.pointerEvents='auto';
   }
 }
 
@@ -1208,6 +1334,11 @@ const SINPICOS_API_URL = 'https://sinpicos-api.ejmanosalvas.workers.dev/analyze'
 function fotoSelected(input){
   var file=input.files[0];
   if(!file)return;
+  if(!currentUser){
+    showAuthScreen('📸 Crea una cuenta gratuita para analizar fotos con IA. ¡Es gratis!');
+    input.value='';
+    return;
+  }
   fotoCurrentFile=file;
 
   var reader=new FileReader();
@@ -1313,8 +1444,252 @@ function fotoAddAll(){
   showToast('✅ Añadido al plato desde foto');
 }
 
+// ═══ PRO: DIARY (Diario de comidas) ═══
+function getDiary(){try{return JSON.parse(localStorage.getItem('sp_diary')||'{}');}catch{return {};}}
+function saveDiary(d){localStorage.setItem('sp_diary',JSON.stringify(d));if(typeof scheduleSave==='function')scheduleSave();}
+
+function diaryAddEntry(name,portion,hc){
+  const key=new Date().toISOString().slice(0,10);
+  const diary=getDiary();
+  if(!diary[key])diary[key]={items:[],totalHC:0};
+  diary[key].items.push({name,portion,hc,time:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})});
+  diary[key].totalHC=diary[key].items.reduce((s,i)=>s+i.hc,0);
+  // Keep only last 30 days
+  const keys=Object.keys(diary).sort().reverse().slice(0,30);
+  const trimmed={};keys.forEach(k=>trimmed[k]=diary[k]);
+  saveDiary(trimmed);
+}
+
+function renderDiary(){
+  const isPro_=getPlan()==='pro';
+  const gate=document.getElementById('diary-gate');
+  const chart=document.getElementById('diary-chart');
+  const list=document.getElementById('diary-list');
+  const favEl=document.getElementById('fav-list');
+  const exportBtn=document.getElementById('export-pdf-btn');
+  const fsiCalc=document.getElementById('fsi-calc');
+  if(!isPro_){
+    gate.style.display='block';
+    chart.style.display='none';
+    list.style.display='none';
+    favEl.style.display='none';
+    exportBtn.style.display='none';
+    if(fsiCalc)fsiCalc.style.display='none';
+    return;
+  }
+  gate.style.display='none';
+  chart.style.display='';
+  list.style.display='';
+  favEl.style.display='';
+  exportBtn.style.display='flex';
+  if(fsiCalc)fsiCalc.style.display='';
+  renderFavorites();
+  renderDiaryChart();
+  renderDiaryList();
+  updateFSIPlateHC();
+}
+
+// ═══ PRO: FSI CALCULATOR ═══
+function calcFSI(){
+  const ddt=parseFloat(document.getElementById('fsi-ddt').value);
+  const rule=parseInt(document.getElementById('fsi-type').value);
+  const resultEl=document.getElementById('fsi-result');
+  const plateCalc=document.getElementById('fsi-plate-calc');
+
+  if(!ddt||ddt<=0){
+    resultEl.style.display='none';
+    plateCalc.style.display='none';
+    return;
+  }
+
+  const fsi=Math.round(rule/ddt);
+  document.getElementById('fsi-value').textContent=fsi+' mg/dL';
+  document.getElementById('fsi-desc').textContent='1 unidad de insulina baja tu glucemia ~'+fsi+' mg/dL';
+  resultEl.style.display='block';
+  plateCalc.style.display='block';
+  updateFSIPlateHC();
+
+  // Calculate dose if ratio is set
+  const ratio=parseFloat(document.getElementById('fsi-ratio').value);
+  const plateHC=plate.reduce((s,i)=>s+i.hc,0);
+  const doseResult=document.getElementById('fsi-dose-result');
+
+  if(ratio>0&&plateHC>0){
+    const raciones=(plateHC/ratio).toFixed(1);
+    document.getElementById('fsi-dose-val').textContent=raciones+' raciones';
+    document.getElementById('fsi-dose-explain').textContent=plateHC+'g HC ÷ '+ratio+' (ratio) = '+raciones+' raciones de insulina';
+    doseResult.style.display='block';
+  } else {
+    doseResult.style.display='none';
+  }
+}
+
+function updateFSIPlateHC(){
+  const el=document.getElementById('fsi-plate-hc');
+  if(!el)return;
+  const totalHC=plate.reduce((s,i)=>s+i.hc,0);
+  el.textContent=totalHC?totalHC+'g HC':'— (plato vacío)';
+  // Recalc if DDT is filled
+  if(document.getElementById('fsi-ddt').value)calcFSI();
+}
+
+function renderDiaryList(){
+  const diary=getDiary();
+  const el=document.getElementById('diary-list');
+  const keys=Object.keys(diary).sort().reverse();
+  if(!keys.length){el.innerHTML='<div class="diary-empty">📝 Aún no hay registros.<br>Añade comida a tu plato y aparecerá aquí.</div>';return;}
+  const dayNames=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  el.innerHTML=keys.map((k,idx)=>{
+    const d=diary[k];
+    const date=new Date(k+'T12:00:00');
+    const label=dayNames[date.getDay()]+' '+date.getDate()+'/'+(date.getMonth()+1);
+    const rac=(d.totalHC/10).toFixed(1);
+    return `<div class="diary-day${idx===0?' open':''}">
+      <div class="diary-day-hdr" onclick="this.closest('.diary-day').classList.toggle('open')">
+        <span class="dd-date">${label}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="dd-hc">${d.totalHC}g HC · ${rac} rac</span>
+          <span class="dd-arrow">▾</span>
+        </div>
+      </div>
+      <div class="diary-day-body">
+        ${d.items.map(i=>`<div class="diary-item"><span class="di-name">${i.name} <span style="font-size:.7rem;color:var(--brown-l)">${i.time||''}</span></span><span class="di-hc">${i.hc}g</span></div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDiaryChart(){
+  const diary=getDiary();
+  const el=document.getElementById('diary-chart');
+  const today=new Date();
+  const days=[];
+  const dayN=['D','L','M','X','J','V','S'];
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    const k=d.toISOString().slice(0,10);
+    days.push({key:k,label:dayN[d.getDay()],num:d.getDate(),hc:diary[k]?diary[k].totalHC:0});
+  }
+  const maxHC=Math.max(1,...days.map(d=>d.hc));
+  const avgHC=days.filter(d=>d.hc>0);
+  const avg=avgHC.length?Math.round(avgHC.reduce((s,d)=>s+d.hc,0)/avgHC.length):0;
+  const avgRac=(avg/10).toFixed(1);
+
+  el.innerHTML=`<div class="chart-wrap">
+    <h3>📈 Últimos 7 días</h3>
+    <div class="chart-bars">${days.map(d=>{
+      const pct=maxHC?Math.round((d.hc/maxHC)*120):0;
+      return `<div class="chart-col"><div class="chart-val">${d.hc||''}</div><div class="chart-bar" style="height:${pct}px;opacity:${d.hc?1:.15}"></div><div class="chart-lbl">${d.label}</div></div>`;
+    }).join('')}</div>
+    <div class="chart-avg">
+      <div class="chart-avg-item"><span class="ca-val">${avg}g</span><span class="ca-lbl">HC/día</span></div>
+      <div class="chart-avg-item"><span class="ca-val">${avgRac}</span><span class="ca-lbl">Rac/día</span></div>
+      <div class="chart-avg-item"><span class="ca-val">${avgHC.length}/7</span><span class="ca-lbl">Días registrados</span></div>
+    </div>
+  </div>`;
+}
+
+// ═══ PRO: FAVORITES ═══
+function getFavs(){try{return JSON.parse(localStorage.getItem('sp_favs')||'[]');}catch{return[];}}
+function saveFavs(f){localStorage.setItem('sp_favs',JSON.stringify(f));if(typeof scheduleSave==='function')scheduleSave();}
+
+function toggleFav(name,portion,hc){
+  let favs=getFavs();
+  const idx=favs.findIndex(f=>f.name===name);
+  if(idx>=0){favs.splice(idx,1);showToast('⭐ Eliminado de favoritos');}
+  else{favs.unshift({name,portion,hc});showToast('⭐ Añadido a favoritos');}
+  saveFavs(favs);
+  renderFavorites();
+}
+
+function isFav(name){return getFavs().some(f=>f.name===name);}
+
+function renderFavorites(){
+  const favs=getFavs();
+  const el=document.getElementById('fav-list');
+  if(!el)return;
+  if(!favs.length){el.innerHTML='<div class="fav-empty">Mantén pulsado un plato para añadirlo a favoritos</div>';return;}
+  el.innerHTML=favs.map(f=>
+    `<div class="fav-chip" onclick="addItem('${f.name.replace(/'/g,"\\'")}','${(f.portion||'Favorito').replace(/'/g,"\\'")}',${f.hc})">
+      ${f.name} <span class="fav-hc">${f.hc}g</span>
+      <span class="fav-rm" onclick="event.stopPropagation();toggleFav('${f.name.replace(/'/g,"\\'")}','${(f.portion||'').replace(/'/g,"\\'")}',${f.hc})">✕</span>
+    </div>`
+  ).join('');
+}
+
+// ═══ PRO: EXPORT PDF ═══
+function exportPDF(){
+  if(getPlan()!=='pro'){document.querySelector('[data-tab=pro]').click();return;}
+  const diary=getDiary();
+  const keys=Object.keys(diary).sort().reverse().slice(0,7);
+  if(!keys.length&&!plate.length){showToast('❌ No hay datos para exportar');return;}
+
+  let html='<html><head><meta charset="UTF-8"><title>SinPicos — Resumen</title>';
+  html+='<style>body{font-family:Arial,sans-serif;padding:24px;color:#2E1F14;max-width:700px;margin:0 auto}';
+  html+='h1{color:#B85C38;font-size:1.5rem;margin-bottom:4px}h2{font-size:1.1rem;color:#6B4F3A;margin:20px 0 8px;border-bottom:2px solid #E2D9CF;padding-bottom:4px}';
+  html+='table{width:100%;border-collapse:collapse;margin-bottom:16px}th,td{text-align:left;padding:6px 10px;border-bottom:1px solid #E2D9CF;font-size:.9rem}';
+  html+='th{background:#F7F3ED;font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;color:#9C7A63}';
+  html+='.total{font-weight:700;color:#B85C38;font-size:1rem}.footer{margin-top:30px;font-size:.75rem;color:#9C7A63;text-align:center}</style></head><body>';
+  html+='<h1>🍽️ SinPicos</h1><p style="color:#9C7A63;font-size:.85rem">Resumen de hidratos de carbono</p>';
+
+  // Current plate
+  if(plate.length){
+    const total=plate.reduce((s,i)=>s+i.hc,0);
+    const rac=(total/10).toFixed(1);
+    html+='<h2>📋 Plato actual — '+new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})+'</h2>';
+    html+='<table><tr><th>Alimento</th><th>Porción</th><th style="text-align:right">HC</th></tr>';
+    plate.forEach(i=>{html+='<tr><td>'+i.name+'</td><td>'+i.portion+'</td><td style="text-align:right">'+i.hc+'g</td></tr>';});
+    html+='<tr><td colspan="2" class="total">Total</td><td style="text-align:right" class="total">'+total+'g HC ('+rac+' rac)</td></tr></table>';
+  }
+
+  // Diary history
+  if(keys.length){
+    html+='<h2>📈 Historial (últimos '+keys.length+' días)</h2>';
+    html+='<table><tr><th>Fecha</th><th>Comidas</th><th style="text-align:right">HC total</th><th style="text-align:right">Raciones</th></tr>';
+    keys.forEach(k=>{
+      const d=diary[k];const date=new Date(k+'T12:00:00');
+      html+='<tr><td>'+date.toLocaleDateString('es-ES',{day:'numeric',month:'short'})+'</td><td>'+d.items.length+'</td><td style="text-align:right">'+d.totalHC+'g</td><td style="text-align:right">'+(d.totalHC/10).toFixed(1)+'</td></tr>';
+    });
+    html+='</table>';
+  }
+
+  html+='<div class="footer">Generado por SinPicos · '+new Date().toLocaleDateString('es-ES')+'<br>⚠️ Estimación orientativa. Consulta siempre con tu médico.</div>';
+  html+='</body></html>';
+
+  const w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();setTimeout(()=>w.print(),500);}
+  else{showToast('❌ Permite ventanas emergentes para exportar');}
+}
+
+// ═══ OFFLINE MODE ═══
+window.addEventListener('online',()=>{document.getElementById('offlineBar').classList.remove('show');if(typeof scheduleSave==='function')scheduleSave();});
+window.addEventListener('offline',()=>{document.getElementById('offlineBar').classList.add('show');});
+
+// ═══ PATCH addItem to also save to diary and update FSI ═══
+const _origAddItem=addItem;
+addItem=function(name,portion,hc){
+  _origAddItem(name,portion,hc);
+  if(getPlan()==='pro')diaryAddEntry(name,portion,hc);
+  if(typeof updateFSIPlateHC==='function')updateFSIPlateHC();
+};
+
+// ═══ AUTH HELPERS ═══
+function showAuthScreen(reason){
+  authMode='register';
+  document.getElementById('authTitle').textContent='Crear cuenta';
+  document.getElementById('authBtn').textContent='Crear cuenta';
+  document.getElementById('authToggle').innerHTML='¿Ya tienes cuenta? <a onclick="toggleAuthMode()">Inicia sesión</a>';
+  document.getElementById('authForgot').style.display='none';
+  document.getElementById('authPass').autocomplete='new-password';
+  const r=document.getElementById('authReason');
+  if(reason){r.textContent=reason;r.style.display='block'}else{r.style.display='none'}
+  hideAuthError();
+  document.getElementById('authScreen').classList.remove('gone');
+}
+function closeAuthScreen(){document.getElementById('authScreen').classList.add('gone')}
+
 // INIT
-renderDishes();renderIngredients();renderCustomDishes();renderSheet();applyTheme(getTheme());updateFotoUI();
+renderDishes();renderIngredients();renderCustomDishes();renderSheet();applyTheme(getTheme());updateFotoUI();renderDiary();
 </script>
 
 <!-- Firebase SDK -->
@@ -1372,7 +1747,7 @@ function authSubmit(){
   const fn=authMode==='login'
     ?auth.signInWithEmailAndPassword(email,pass)
     :auth.createUserWithEmailAndPassword(email,pass);
-  fn.then(()=>{btn.disabled=false})
+  fn.then(()=>{btn.disabled=false;closeAuthScreen()})
     .catch(err=>{
       btn.disabled=false;
       btn.textContent=authMode==='login'?'Entrar':'Crear cuenta';
@@ -1435,6 +1810,8 @@ async function loadUserData(){
         }
       }
       if(d.usedCodes)localStorage.setItem('sp_used_codes',JSON.stringify(d.usedCodes));
+      if(d.diary)localStorage.setItem('sp_diary',JSON.stringify(d.diary));
+      if(d.favs)localStorage.setItem('sp_favs',JSON.stringify(d.favs));
     } else {
       await saveAllToFirestore();
     }
@@ -1459,6 +1836,8 @@ async function saveAllToFirestore(){
         count:getFotoCount()
       },
       usedCodes:JSON.parse(localStorage.getItem('sp_used_codes')||'[]'),
+      diary:getDiary(),
+      favs:getFavs(),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
     };
     await userDoc().set(data,{merge:true});
@@ -1488,12 +1867,14 @@ if(auth){
     if(user){
       authScreen.classList.add('gone');
       userBar.style.display='flex';
+      document.getElementById('loginBtn').style.display='none';
       document.getElementById('userEmail').textContent=user.email||user.displayName||'';
       await loadUserData();
-      renderCustomDishes();renderSheet();updateFotoUI();applyTheme(getTheme());
+      renderCustomDishes();renderSheet();updateFotoUI();applyTheme(getTheme());renderDiary();
     } else {
-      authScreen.classList.remove('gone');
+      authScreen.classList.add('gone');
       userBar.style.display='none';
+      document.getElementById('loginBtn').style.display='';
       firestoreReady=false;
     }
   });
