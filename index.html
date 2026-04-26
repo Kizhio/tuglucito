@@ -2,155 +2,156 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SinPicos - Control Glucémico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SinPicos · Hidratos fácil</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* Estilos específicos para la pantalla de Auth (Estilo PlatoFit/SinPicos) */
-        #auth-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
+        /* CSS de Autenticación Exacto de PlatoFit */
+        #auth-screen {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: #fdfaf7; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-
         .auth-card {
-            background: #f8f9fa;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
+            width: 100%; max-width: 360px; text-align: center;
         }
-
-        .auth-card h2 {
-            color: #2c3e50;
-            margin-bottom: 1.5rem;
+        .auth-logo {
+            width: 80px; height: 80px; background: #2E1F14; border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; color: white; font-size: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
+        .auth-card h2 { margin-bottom: 8px; color: #2E1F14; font-size: 24px; }
+        .auth-card p { margin-bottom: 24px; color: #666; font-size: 15px; }
 
+        .auth-form input {
+            width: 100%; padding: 14px; margin-bottom: 12px;
+            border: 1px solid #ddd; border-radius: 12px; font-size: 16px;
+            box-sizing: border-box; background: white;
+        }
+        .btn-auth {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s;
+            margin-bottom: 12px;
+        }
+        .btn-main { background: #2E1F14; color: white; }
         .btn-google {
-            background-color: #ffffff;
-            color: #757575;
-            border: 1px solid #ddd;
-            padding: 12px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
+            background: white; color: #444; border: 1px solid #ddd;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-
-        .btn-google:hover {
-            background-color: #f1f1f1;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        .auth-toggle { color: #2E1F14; font-size: 14px; cursor: pointer; text-decoration: underline; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="auth-container">
+    <div id="auth-screen">
         <div class="auth-card">
-            <i class="fas fa-chart-line" style="font-size: 3rem; color: #4CAF50; margin-bottom: 1rem;"></i>
-            <h2>Bienvenido a SinPicos</h2>
-            <p style="color: #666; margin-bottom: 2rem;">Inicia sesión para gestionar tus niveles de glucosa.</p>
-            
-            <button class="btn-google" id="btn-google">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="18">
-                Continuar con Google
-            </button>
-            
-            <p id="auth-error" style="color: #e74c3c; margin-top: 1rem; font-size: 0.9rem; display: none;"></p>
+            <div class="auth-logo">📈</div> <h2 id="auth-title">Entrar en SinPicos</h2>
+            <p id="auth-desc">Controla tu diabetes con precisión</p>
+
+            <div class="auth-form">
+                <input type="email" id="auth-email" placeholder="Correo electrónico">
+                <input type="password" id="auth-pass" placeholder="Contraseña">
+                
+                <button class="btn-auth btn-main" onclick="authSubmit()" id="btn-submit">Entrar</button>
+                
+                <div style="margin: 15px 0; color: #999; font-size: 12px;">O CONTINÚA CON</div>
+                
+                <button class="btn-auth btn-google" onclick="authGoogle()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+                    Google
+                </button>
+            </div>
+
+            <div class="auth-toggle" id="auth-toggle" onclick="toggleAuthMode()">¿No tienes cuenta? Regístrate</div>
         </div>
     </div>
 
     <div id="app-content" class="hidden">
-        <header>
-            <div class="header-container">
-                <h1>SinPicos</h1>
-                <button id="btn-logout" style="background: none; border: none; color: white; cursor: pointer;">
-                    <i class="fas fa-sign-out-alt"></i> Salir
-                </button>
-            </div>
+        <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #2E1F14; color: white;">
+            <span>SinPicos</span>
+            <i class="fas fa-sign-out-alt" onclick="authLogout()" style="cursor: pointer;"></i>
         </header>
-
+        
         <main>
-            <section class="dashboard">
-                <p>Cargando datos de usuario...</p>
-            </section>
-        </main>
+            </main>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+            signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 1. PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE PARA SINPICOS
+        // CONFIGURACIÓN: Enrique, pon aquí los datos de tu nuevo proyecto de Firebase para SinPicos
         const firebaseConfig = {
             apiKey: "TU_API_KEY",
-            authDomain: "TU_DOMINIO.firebaseapp.com",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_BUCKET.appspot.com",
-            messagingSenderId: "TU_SENDER_ID",
+            authDomain: "sinpicos-app.firebaseapp.com",
+            projectId: "sinpicos-app",
+            storageBucket: "sinpicos-app.appspot.com",
+            messagingSenderId: "TU_ID",
             appId: "TU_APP_ID"
         };
 
-        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        // Referencias DOM
-        const authContainer = document.getElementById('auth-container');
-        const appContent = document.getElementById('app-content');
-        const btnGoogle = document.getElementById('btn-google');
-        const btnLogout = document.getElementById('btn-logout');
-        const errorMsg = document.getElementById('auth-error');
+        let isRegisterMode = false;
 
-        // 2. LÓGICA DE AUTENTICACIÓN
-        btnGoogle.addEventListener('click', async () => {
+        // Cambiar entre Login y Registro
+        window.toggleAuthMode = () => {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('auth-title').innerText = isRegisterMode ? 'Crear cuenta' : 'Entrar en SinPicos';
+            document.getElementById('btn-submit').innerText = isRegisterMode ? 'Registrarse' : 'Entrar';
+            document.getElementById('auth-toggle').innerText = isRegisterMode ? '¿Ya tienes cuenta? Entra' : '¿No tienes cuenta? Regístrate';
+        };
+
+        // Login/Registro con Email
+        window.authSubmit = async () => {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            if(!email || !pass) return alert("Rellena todos los campos");
+
+            try {
+                if(isRegisterMode) {
+                    await createUserWithEmailAndPassword(auth, email, pass);
+                } else {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                }
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        };
+
+        // Login con Google
+        window.authGoogle = async () => {
             try {
                 await signInWithPopup(auth, provider);
-            } catch (error) {
-                errorMsg.innerText = "Error al conectar con Google. Inténtalo de nuevo.";
-                errorMsg.style.display = 'block';
-                console.error(error);
+            } catch (e) {
+                alert("Error con Google: " + e.message);
             }
-        });
+        };
 
-        btnLogout.addEventListener('click', () => {
-            signOut(auth);
-        });
+        // Cerrar sesión
+        window.authLogout = () => signOut(auth);
 
-        // 3. OBSERVADOR DE ESTADO (El corazón de la integración)
+        // Observador de estado (Gestiona qué pantalla se ve)
         onAuthStateChanged(auth, (user) => {
+            const authScreen = document.getElementById('auth-screen');
+            const appContent = document.getElementById('app-content');
+            
             if (user) {
-                // Usuario logueado: Mostramos la web y ocultamos el login
-                authContainer.classList.add('hidden');
+                authScreen.classList.add('hidden');
                 appContent.classList.remove('hidden');
-                console.log("Bienvenido:", user.displayName);
-                
-                // Aquí podrías llamar a tu función de cargar datos de glucosa
-                // inicializarGraficas(user.uid); 
+                // Aquí Enrique, puedes llamar a tus funciones de SinPicos para cargar los datos del usuario
             } else {
-                // Usuario no logueado: Mostramos login y ocultamos la web
-                authContainer.classList.remove('hidden');
+                authScreen.classList.remove('hidden');
                 appContent.classList.add('hidden');
             }
         });
