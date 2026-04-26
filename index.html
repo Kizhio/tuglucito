@@ -260,6 +260,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 .foto-disclaimer{font-size:0.72rem;color:var(--brown-l);text-align:center;margin-top:8px;line-height:1.4;font-weight:300;}
 .foto-error{background:rgba(200,60,60,0.08);border:1.5px solid rgba(200,60,60,0.2);border-radius:14px;padding:14px 16px;text-align:center;color:#994;font-size:0.85rem;margin-bottom:12px;}
 
+.promo-row{display:flex;gap:8px;margin-top:8px;}
+.promo-input{flex:1;padding:12px 14px;border:1.5px solid var(--border);border-radius:11px;font-family:'DM Sans',sans-serif;font-size:0.92rem;color:var(--brown);outline:none;background:var(--cream);-webkit-appearance:none;text-transform:uppercase;letter-spacing:1px;}
+.promo-input:focus{border-color:var(--gold);}
+.promo-btn{background:var(--gold);color:white;border:none;border-radius:11px;padding:12px 18px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+.promo-btn:active{transform:scale(0.97);}
+.promo-msg{font-size:0.82rem;margin-top:8px;padding:8px 12px;border-radius:10px;display:none;}
+.promo-msg.ok{display:block;background:rgba(92,122,95,0.1);color:var(--sage);}
+.promo-msg.err{display:block;background:rgba(200,60,60,0.08);color:#c44;}
+
 </style>
 </head>
 <body>
@@ -492,8 +501,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
       </div>
     </div>
 
+    <div style="text-align:center;font-size:0.78rem;color:var(--brown-l);margin-bottom:14px;">— o usa un código —</div>
+    <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px;">
+      <div class="promo-row">
+        <input class="promo-input" id="promoInput" type="text" placeholder="Código de promoción" autocapitalize="characters" autocomplete="off" spellcheck="false">
+        <button class="promo-btn" onclick="redeemCode()">Canjear</button>
+      </div>
+      <div id="promoMsg" class="promo-msg"></div>
+    </div>
+
     <div style="text-align:center;padding:8px;font-size:0.72rem;color:var(--brown-l);line-height:1.5;">
-      El pago se integrará próximamente.<br>Ahora puedes probar Pro pulsando el botón.
+      El pago se integrará próximamente.<br>Ahora puedes usar un código promocional.
     </div>
 
   </div>
@@ -1002,9 +1020,58 @@ _usI.addEventListener('input',function(){
 // ═══ FOTO IA + FREE/PRO SYSTEM ═══
 
 // --- Plan & Usage ---
-function getPlan(){return localStorage.getItem('sp_plan')||'free';}
+function getPlan(){
+  var pro=localStorage.getItem('sp_pro');
+  if(pro!=='true') return 'free';
+  var exp=parseInt(localStorage.getItem('sp_pro_exp')||'0');
+  if(exp && Date.now()>exp){
+    localStorage.removeItem('sp_pro');
+    localStorage.removeItem('sp_pro_exp');
+    return 'free';
+  }
+  return 'pro';
+}
 function setPlan(p){localStorage.setItem('sp_plan',p);}
 function getMaxFotos(){return getPlan()==='pro'?15:2;}
+
+// --- Promo Codes ---
+var PRO_CODES={
+  'SINPICOS2026':{days:365,label:'1 año'},
+  'PROFRIEND':{days:30,label:'1 mes'},
+  'REGALO90':{days:90,label:'3 meses'},
+  'BETAUSER':{days:180,label:'6 meses'},
+  'PROLIFE':{days:36500,label:'de por vida'}
+};
+
+function redeemCode(){
+  var input=document.getElementById('promoInput');
+  var msg=document.getElementById('promoMsg');
+  var code=input.value.trim().toUpperCase();
+  if(!code){
+    msg.className='promo-msg err';msg.textContent='Escribe un código';
+    input.focus();
+    return;
+  }
+  var usedCodes=JSON.parse(localStorage.getItem('sp_used_codes')||'[]');
+  if(usedCodes.indexOf(code)!==-1){
+    msg.className='promo-msg err';msg.textContent='❌ Este código ya ha sido canjeado';
+    return;
+  }
+  var gift=PRO_CODES[code];
+  if(gift){
+    localStorage.setItem('sp_pro','true');
+    localStorage.setItem('sp_pro_exp',(Date.now()+gift.days*24*60*60*1000).toString());
+    usedCodes.push(code);
+    localStorage.setItem('sp_used_codes',JSON.stringify(usedCodes));
+    msg.className='promo-msg ok';msg.textContent='✅ ¡Pro '+gift.label+' activado!';
+    input.value='';
+    updateFotoUI();
+    setTimeout(function(){showToast('🎁 ¡Código canjeado! Pro '+gift.label)},800);
+  } else {
+    msg.className='promo-msg err';msg.textContent='❌ Código no válido';
+    input.select();
+  }
+}
 
 function getTodayKey(){return 'sp_fotos_'+new Date().toISOString().slice(0,10);}
 function getFotoCount(){return parseInt(localStorage.getItem(getTodayKey())||'0');}
