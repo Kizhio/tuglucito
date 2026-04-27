@@ -202,13 +202,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 .disclaimer-txt{font-size:0.7rem;color:var(--brown-l);line-height:1.5;text-align:center;font-weight:300;padding:0 4px;}
 
 .install-hint{margin-top:10px;border-top:1px solid var(--border);padding-top:10px;}
-.itoggle{width:100%;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:0.72rem;color:var(--brown-l);cursor:pointer;text-align:center;padding:6px;}
-.ibody{display:none;padding-top:8px;}
+.itoggle{width:100%;background:var(--cream);border:1.5px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;color:var(--brown);cursor:pointer;text-align:center;padding:12px 16px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.itoggle:active{transform:scale(0.97);border-color:var(--terra);}
+.ibody{display:none;padding-top:12px;}
 .ibody.open{display:block;}
-.ios-os{margin-bottom:10px;}
-.ios-os strong{font-size:0.74rem;color:var(--brown-m);display:block;margin-bottom:3px;}
-.ios-os ol{padding-left:16px;}
-.ios-os li{font-size:0.71rem;color:var(--brown-l);line-height:1.7;font-weight:300;}
+.install-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:18px 16px;margin-bottom:10px;}
+.install-card-title{display:flex;align-items:center;gap:8px;font-size:0.88rem;font-weight:600;color:var(--brown);margin-bottom:12px;}
+.install-card-title span{font-size:1.3rem;}
+.install-steps{list-style:none;counter-reset:step;padding:0;}
+.install-steps li{counter-increment:step;display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--brown-m);line-height:1.5;font-weight:400;}
+.install-steps li:last-child{border-bottom:none;padding-bottom:0;}
+.install-steps li::before{content:counter(step);background:var(--terra);color:white;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;margin-top:1px;}
+.install-steps li strong{font-weight:600;color:var(--brown);}
+.install-steps li .step-icon{font-size:1.1rem;flex-shrink:0;}
 
 
 .theme-btn{background:none;border:1px solid rgba(255,255,255,.2);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;flex-shrink:0;transition:all .2s;}
@@ -417,6 +423,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
   <div class="ures" id="usearch-results" style="display:none;padding:0 14px;"></div>
 
   <div class="panel active" id="panel-platos">
+    <!-- Banner instalar como app -->
+    <div id="install-banner" class="install-card" style="margin-bottom:12px;border-color:var(--terra);position:relative;">
+      <button onclick="this.parentElement.style.display='none';localStorage.setItem('sp_install_dismissed','1')" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;color:var(--brown-l);cursor:pointer;padding:4px;line-height:1;">✕</button>
+      <div style="text-align:center;margin-bottom:10px;">
+        <div style="font-size:2rem;margin-bottom:4px;">📲</div>
+        <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--brown);">Instala SinPicos en tu móvil</div>
+        <div style="font-size:0.78rem;color:var(--brown-l);margin-top:2px;">Se abre como una app real, a pantalla completa y sin navegador</div>
+      </div>
+      <div class="install-card" style="border-color:var(--border);margin-bottom:8px;">
+        <div class="install-card-title"><span>🍎</span> iPhone / iPad</div>
+        <ol class="install-steps">
+          <li>Abre <strong>sinpicos.com</strong> en <strong>Safari</strong> (obligatorio Safari)</li>
+          <li>Pulsa el icono <strong>compartir</strong> <span class="step-icon">⬆️</span> de la barra inferior</li>
+          <li>Pulsa <strong>«Añadir a pantalla de inicio»</strong> <span class="step-icon">➕</span></li>
+          <li>Pulsa <strong>«Añadir»</strong> y listo</li>
+        </ol>
+      </div>
+      <div class="install-card" style="border-color:var(--border);margin-bottom:0;">
+        <div class="install-card-title"><span>🤖</span> Android</div>
+        <ol class="install-steps">
+          <li>Abre <strong>sinpicos.com</strong> en <strong>Chrome</strong></li>
+          <li>Pulsa los <strong>tres puntos</strong> <span class="step-icon">⋮</span> arriba a la derecha</li>
+          <li>Pulsa <strong>«Instalar aplicación»</strong> o <strong>«Añadir a pantalla de inicio»</strong></li>
+          <li>Confirma con <strong>«Instalar»</strong> y listo</li>
+        </ol>
+      </div>
+    </div>
+
     <div class="cat-bar" id="platos-cats">
       <button class="cat-btn active" data-cat="all">Todos</button>
       <button class="cat-btn" data-cat="primeros">🥘 Primeros</button>
@@ -611,6 +645,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
       <div id="pro-status-badge" style="display:inline-block;margin-top:12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:5px 14px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px;"></div>
     </div>
 
+    <!-- Sección de compra (se oculta cuando ya es Pro) -->
+    <div id="pro-purchase-section">
+
     <!-- Comparativa HONESTA -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
 
@@ -690,6 +727,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
       Pago procesado de forma segura por PayPal.<br>Puedes pagar con tarjeta sin tener cuenta PayPal.
     </div>
 
+    </div><!-- fin pro-purchase-section -->
+
   </div>
 
 </div>
@@ -701,7 +740,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
     <div class="sheet-title">🍽️ Mi plato</div>
     <button class="sheet-close" onclick="closeSheet()">✕</button>
   </div>
-  <div class="sheet-body" id="sheet-body"><div class="plate-empty-msg"><div class="pe-icon">🥗</div><p>Pulsa cualquier plato o alimento para añadirlo aquí</p></div><div class="disclaimer-txt">⚠️ Estimación orientativa. Consulta siempre con tu médico antes de ajustar el tratamiento.</div><div class="install-hint"><button class="itoggle" onclick="this.nextElementSibling.classList.toggle(&#39;open&#39;)">📲 Guardar como app en el móvil ▾</button><div class="ibody"><div class="ios-os"><strong>🍎 iPhone (Safari)</strong><ol><li>Entra en <strong>sinpicos.com</strong> desde Safari</li><li>Pulsa el botón compartir ⬆ (barra inferior)</li><li>«Añadir a pantalla de inicio»</li><li>Pulsa «Añadir»</li></ol></div><div class="ios-os"><strong>🤖 Android (Chrome)</strong><ol><li>Entra en <strong>sinpicos.com</strong> desde Chrome</li><li>Pulsa los tres puntos ⋮ (arriba a la derecha)</li><li>«Añadir a pantalla de inicio»</li><li>Confirma «Añadir»</li></ol></div></div></div></div>
+  <div class="sheet-body" id="sheet-body"><div class="plate-empty-msg"><div class="pe-icon">🥗</div><p>Pulsa cualquier plato o alimento para añadirlo aquí</p></div><div class="disclaimer-txt">⚠️ Estimación orientativa. Consulta siempre con tu médico antes de ajustar el tratamiento.</div><div class="install-hint"><button class="itoggle" onclick="this.nextElementSibling.classList.toggle('open')">📲 Instalar como app en tu móvil ▾</button><div class="ibody"><div class="install-card"><div class="install-card-title"><span>🍎</span> iPhone / iPad (Safari)</div><ol class="install-steps"><li>Abre <strong>sinpicos.com</strong> en <strong>Safari</strong> (no vale Chrome ni otro navegador)</li><li>Pulsa el icono de <strong>compartir</strong> <span class="step-icon">⬆️</span> en la barra inferior</li><li>Desliza hacia abajo y pulsa <strong>«Añadir a pantalla de inicio»</strong> <span class="step-icon">➕</span></li><li>Pulsa <strong>«Añadir»</strong> arriba a la derecha y listo — ya tienes el icono en tu pantalla</li></ol></div><div class="install-card"><div class="install-card-title"><span>🤖</span> Android (Chrome)</div><ol class="install-steps"><li>Abre <strong>sinpicos.com</strong> en <strong>Google Chrome</strong></li><li>Pulsa los <strong>tres puntos</strong> <span class="step-icon">⋮</span> arriba a la derecha</li><li>Pulsa <strong>«Añadir a pantalla de inicio»</strong> o <strong>«Instalar aplicación»</strong></li><li>Confirma pulsando <strong>«Instalar»</strong> y listo — se abrirá como una app a pantalla completa</li></ol></div><div style="text-align:center;font-size:0.75rem;color:var(--brown-l);line-height:1.5;padding:4px 0;">💡 Al instalarla se abre a pantalla completa, sin barra del navegador, y funciona incluso sin conexión.</div></div></div></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -918,7 +957,32 @@ function renderSheet(){
 }
 
 function installHTML(){
-  return `<div class="install-hint"><button class="itoggle" onclick="this.nextElementSibling.classList.toggle('open')">📲 Guardar como app en el móvil ▾</button><div class="ibody"><div class="ios-os"><strong>🍎 iPhone (Safari)</strong><ol><li>Entra en <strong>sinpicos.com</strong> desde Safari</li><li>Pulsa el botón compartir ⬆ (barra inferior)</li><li>«Añadir a pantalla de inicio»</li><li>Pulsa «Añadir»</li></ol></div><div class="ios-os"><strong>🤖 Android (Chrome)</strong><ol><li>Entra en <strong>sinpicos.com</strong> desde Chrome</li><li>Pulsa los tres puntos ⋮ (arriba a la derecha)</li><li>«Añadir a pantalla de inicio»</li><li>Confirma «Añadir»</li></ol></div></div></div>`;
+  return `<div class="install-hint">
+    <button class="itoggle" onclick="this.nextElementSibling.classList.toggle('open')">📲 Instalar como app en tu móvil ▾</button>
+    <div class="ibody">
+      <div class="install-card">
+        <div class="install-card-title"><span>🍎</span> iPhone / iPad (Safari)</div>
+        <ol class="install-steps">
+          <li>Abre <strong>sinpicos.com</strong> en <strong>Safari</strong> (no vale Chrome ni otro navegador)</li>
+          <li>Pulsa el icono de <strong>compartir</strong> <span class="step-icon">⬆️</span> en la barra inferior</li>
+          <li>Desliza hacia abajo y pulsa <strong>«Añadir a pantalla de inicio»</strong> <span class="step-icon">➕</span></li>
+          <li>Pulsa <strong>«Añadir»</strong> arriba a la derecha y listo — ya tienes el icono en tu pantalla</li>
+        </ol>
+      </div>
+      <div class="install-card">
+        <div class="install-card-title"><span>🤖</span> Android (Chrome)</div>
+        <ol class="install-steps">
+          <li>Abre <strong>sinpicos.com</strong> en <strong>Google Chrome</strong></li>
+          <li>Pulsa los <strong>tres puntos</strong> <span class="step-icon">⋮</span> arriba a la derecha</li>
+          <li>Pulsa <strong>«Añadir a pantalla de inicio»</strong> o <strong>«Instalar aplicación»</strong></li>
+          <li>Confirma pulsando <strong>«Instalar»</strong> y listo — se abrirá como una app a pantalla completa</li>
+        </ol>
+      </div>
+      <div style="text-align:center;font-size:0.75rem;color:var(--brown-l);line-height:1.5;padding:4px 0;">
+        💡 Al instalarla se abre a pantalla completa, sin barra del navegador, y funciona incluso sin conexión.
+      </div>
+    </div>
+  </div>`;
 }
 
 // TOAST
@@ -1324,14 +1388,18 @@ function updateFotoUI(){
     badge.style.background='rgba(196,154,44,0.2)';badge.style.border='1px solid rgba(196,154,44,0.4)';badge.style.color='#c49a2c';
     proBanner.style.display='none';
     if(proStatus)proStatus.textContent='✅ PLAN ACTIVO';
-    if(tabPro){tabPro.style.background='rgba(196,154,44,0.15)';tabPro.style.color='var(--gold)';}
+    if(tabPro){tabPro.style.background='rgba(196,154,44,0.15)';tabPro.style.color='var(--gold)';tabPro.style.display='none';}
+    var purchaseSection=document.getElementById('pro-purchase-section');
+    if(purchaseSection)purchaseSection.style.display='none';
     counterTitle.textContent='📸 Usos de hoy';
     counterText.textContent=' — Has usado '+used+' de '+max+' análisis. '+(remaining>0?'Te quedan '+remaining+'.':'Ya no te quedan análisis hoy.');
   } else {
     badge.textContent='🆓 Free · 2 fotos/día';
     proBanner.style.display=(used>=max)?'block':'none';
     if(proStatus)proStatus.textContent='PLAN GRATUITO';
-    if(tabPro){tabPro.style.background='';tabPro.style.color='';}
+    if(tabPro){tabPro.style.background='';tabPro.style.color='';tabPro.style.display='';}
+    var purchaseSection=document.getElementById('pro-purchase-section');
+    if(purchaseSection)purchaseSection.style.display='';
     counterTitle.textContent='📸 Usos de hoy';
     counterText.textContent=' — Has usado '+used+' de '+max+' análisis. '+(remaining>0?'Te quedan '+remaining+'.':'Ya no te quedan análisis hoy.');
   }
@@ -1739,6 +1807,16 @@ function closeAuthScreen(){document.getElementById('authScreen').classList.add('
 
 // INIT
 renderDishes();renderIngredients();renderCustomDishes();renderSheet();applyTheme(getTheme());updateFotoUI();renderDiary();
+
+// Ocultar banner de instalación si ya fue cerrado o si ya es PWA
+(function(){
+  var banner=document.getElementById('install-banner');
+  if(!banner)return;
+  var isStandalone=window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone===true;
+  if(isStandalone||localStorage.getItem('sp_install_dismissed')==='1'){
+    banner.style.display='none';
+  }
+})();
 </script>
 
 <!-- Firebase SDK -->
