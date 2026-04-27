@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YZZLP0N0LN"></script>
@@ -640,14 +642,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
       </div>
     </div>
 
-    <!-- Botones de compra -->
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
-      <button onclick="activatePro('monthly')" style="width:100%;background:var(--sage);color:white;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
-        Suscribirme por 2,99€/mes
-      </button>
-      <button onclick="activatePro('yearly')" style="width:100%;background:var(--gold);color:white;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
+    <!-- Botones de compra PayPal -->
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+      <a href="https://www.paypal.com/ncp/payment/HSQKQTNB4WLZW" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--sage);color:white;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-decoration:none;">
+        💳 Suscribirme por 2,99€/mes
+      </a>
+      <a href="https://www.paypal.com/ncp/payment/GF7AZBB4GYMSL" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--gold);color:white;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-decoration:none;">
         ⭐ Suscribirme por 29,99€/año
-      </button>
+      </a>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;">
+        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal" style="height:18px;">
+        <span style="font-size:0.72rem;color:var(--brown-l);">Pago seguro con PayPal o tarjeta de crédito/débito</span>
+      </div>
     </div>
 
     <!-- Info -->
@@ -675,7 +681,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
     </div>
 
     <div style="text-align:center;padding:8px;font-size:0.72rem;color:var(--brown-l);line-height:1.5;">
-      El pago se integrará próximamente.<br>Ahora puedes usar un código promocional.
+      Pago procesado de forma segura por PayPal.<br>Puedes pagar con tarjeta sin tener cuenta PayPal.
     </div>
 
   </div>
@@ -1303,7 +1309,11 @@ function updateFotoUI(){
 }
 
 function activatePro(type){
-  alert('🚧 Próximamente\n\nEl pago aún no está disponible. Estamos preparando la pasarela de pago.\n\n¡Pronto podrás disfrutar de SinPicos Pro!');
+  if(type==='monthly'){
+    window.open('https://www.paypal.com/ncp/payment/HSQKQTNB4WLZW','_blank');
+  } else {
+    window.open('https://www.paypal.com/ncp/payment/GF7AZBB4GYMSL','_blank');
+  }
 }
 
 // --- Foto handling ---
