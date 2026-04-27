@@ -60,22 +60,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 .tab-btn .ti{font-size:1.2rem;line-height:1;}
 .tab-btn.active{color:var(--terra);border-bottom-color:var(--terra);}
 
-.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 120px;}
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 120px;padding-top:6px;}
 .panel{display:none;}
 .panel.active{display:block;}
 
-.search-wrap{position:relative;margin-bottom:12px;}
+.search-wrap{position:relative;margin-bottom:4px;}
 .search-wrap input{width:100%;padding:13px 16px 13px 44px;background:var(--white);border:1.5px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--brown);outline:none;-webkit-appearance:none;transition:border-color 0.2s;}
 .search-wrap input:focus{border-color:var(--terra);}
 .search-wrap input::placeholder{color:var(--brown-l);}
 .si{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.05rem;pointer-events:none;}
 
-.cat-bar{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none;}
+.cat-bar{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:6px;margin-top:10px;scrollbar-width:none;}
 .cat-bar::-webkit-scrollbar{display:none;}
 .cat-btn{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;color:var(--brown-m);cursor:pointer;transition:all 0.18s;white-space:nowrap;}
 .cat-btn.active{background:var(--terra);border-color:var(--terra);color:white;}
 
-.sec-title{font-family:'Fraunces',serif;font-size:0.95rem;font-weight:500;color:var(--brown);margin:18px 0 8px;padding-bottom:6px;border-bottom:1.5px solid var(--border);}
+.sec-title{font-family:'Fraunces',serif;font-size:0.95rem;font-weight:500;color:var(--brown);margin:18px 0 0;padding:12px 0 10px;border-bottom:1.5px solid var(--border);}
+.sec-title.collapsible{cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;user-select:none;}
+.sec-title.collapsible::after{content:'▾';font-size:0.8rem;color:var(--brown-l);transition:transform 0.25s;}
+.sec-title.collapsible.open::after{transform:rotate(180deg);}
+.sec-group{display:none;padding-top:8px;}
+.sec-group.open{display:block;}
 
 .dish-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;margin-bottom:8px;overflow:hidden;transition:border-color 0.2s;}
 .dish-card.open{border-color:var(--terra);}
@@ -927,8 +932,13 @@ function renderDishes(){
   if(!f.length){document.getElementById('platos-list').innerHTML=`<div class="no-results">😕 No encontramos «${platoSearch}»</div>`;return;}
   let html='';
   if(platoSearch||platoCat!=='all'){html=f.map(dishHTML).join('');}
-  else{const g={};f.forEach(d=>{if(!g[d.cat])g[d.cat]=[];g[d.cat].push(d);});html=Object.entries(g).map(([c,items])=>`<div class="sec-title">${DCAT[c]||c}</div>${items.map(dishHTML).join('')}`).join('');}
+  else{const g={};f.forEach(d=>{if(!g[d.cat])g[d.cat]=[];g[d.cat].push(d);});html=Object.entries(g).map(([c,items])=>`<div class="sec-title collapsible" data-sec="${c}">${DCAT[c]||c}</div><div class="sec-group" data-sec="${c}">${items.map(dishHTML).join('')}</div>`).join('');}
   document.getElementById('platos-list').innerHTML=html;
+  document.querySelectorAll('#platos-list .sec-title.collapsible').forEach(t=>t.addEventListener('click',()=>{
+    t.classList.toggle('open');
+    const grp=t.nextElementSibling;
+    if(grp)grp.classList.toggle('open');
+  }));
   document.querySelectorAll('#platos-list .dish-header').forEach(h=>h.addEventListener('click',()=>h.closest('.dish-card').classList.toggle('open')));
   document.querySelectorAll('#platos-list .add-dish-btn').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const d=DISHES.find(x=>x.id===btn.dataset.id);if(d)addItem(d.name,'Plato completo',d.hc);}));
 }
@@ -944,8 +954,13 @@ function renderIngredients(){
   if(!f.length){document.getElementById('ing-list').innerHTML=`<div class="no-results">😕 No encontramos «${ingSearch}»</div>`;return;}
   let html='';
   if(ingSearch||ingCat!=='all'){html=f.map(foodHTML).join('');}
-  else{const g={};f.forEach(x=>{if(!g[x.cat])g[x.cat]=[];g[x.cat].push(x);});html=Object.entries(g).map(([c,items])=>`<div class="sec-title">${FCAT[c]||c}</div>${items.map(foodHTML).join('')}`).join('');}
+  else{const g={};f.forEach(x=>{if(!g[x.cat])g[x.cat]=[];g[x.cat].push(x);});html=Object.entries(g).map(([c,items])=>`<div class="sec-title collapsible" data-sec="${c}">${FCAT[c]||c}</div><div class="sec-group" data-sec="${c}">${items.map(foodHTML).join('')}</div>`).join('');}
   document.getElementById('ing-list').innerHTML=html;
+  document.querySelectorAll('#ing-list .sec-title.collapsible').forEach(t=>t.addEventListener('click',()=>{
+    t.classList.toggle('open');
+    const grp=t.nextElementSibling;
+    if(grp)grp.classList.toggle('open');
+  }));
   document.querySelectorAll('.portion-btn').forEach(btn=>btn.addEventListener('click',()=>{const f=FOODS.find(x=>x.id===parseInt(btn.dataset.food));const p=f.portions[parseInt(btn.dataset.pi)];const hc=Math.round(f.hcPer100*p.g/100);addItem(f.name,p.name,hc);}));
 }
 function foodHTML(f){
