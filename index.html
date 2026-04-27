@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YZZLP0N0LN"></script>
@@ -1219,43 +1220,63 @@ function getPlan(){
 function setPlan(p){localStorage.setItem('sp_plan',p);}
 function getMaxFotos(){return getPlan()==='pro'?15:2;}
 
-// --- Promo Codes ---
-var PRO_CODES={
-  'SINPICOS2026':{days:365,label:'1 año'},
-  'PROFRIEND':{days:30,label:'1 mes'},
-  'REGALO90':{days:90,label:'3 meses'},
-  'BETAUSER':{days:180,label:'6 meses'},
-  'PROLIFE':{days:36500,label:'de por vida'}
-};
-
-function redeemCode(){
+// --- Promo Codes (Firebase - un solo uso) ---
+async function redeemCode(){
   var input=document.getElementById('promoInput');
   var msg=document.getElementById('promoMsg');
   var code=input.value.trim().toUpperCase();
   if(!code){
     msg.className='promo-msg err';msg.textContent='Escribe un código';
-    input.focus();
+    input.focus();return;
+  }
+  if(typeof currentUser==='undefined'||!currentUser){
+    msg.className='promo-msg err';msg.textContent='⚠️ Inicia sesión para canjear códigos';
     return;
   }
-  var usedCodes=JSON.parse(localStorage.getItem('sp_used_codes')||'[]');
-  if(usedCodes.indexOf(code)!==-1){
-    msg.className='promo-msg err';msg.textContent='❌ Este código ya ha sido canjeado';
+  if(!db){
+    msg.className='promo-msg err';msg.textContent='Firebase no disponible. Recarga la página.';
     return;
   }
-  var gift=PRO_CODES[code];
-  if(gift){
+  var btn=document.querySelector('.promo-btn');
+  btn.disabled=true;btn.textContent='...';
+  try{
+    var codeRef=db.collection('promoCodes').doc(code);
+    var codeDoc=await codeRef.get();
+    if(!codeDoc.exists){
+      msg.className='promo-msg err';msg.textContent='❌ Código no válido';
+      input.select();return;
+    }
+    var data=codeDoc.data();
+    if(data.active===false){
+      msg.className='promo-msg err';msg.textContent='❌ Este código ya no está activo';
+      return;
+    }
+    var usedBy=data.usedBy||[];
+    if(usedBy.indexOf(currentUser.uid)!==-1){
+      msg.className='promo-msg err';msg.textContent='❌ Ya has canjeado este código';
+      return;
+    }
+    if(data.maxUses && usedBy.length>=data.maxUses){
+      msg.className='promo-msg err';msg.textContent='❌ Este código ya ha sido utilizado';
+      return;
+    }
+    await codeRef.update({usedBy:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)});
+    var expMs=Date.now()+data.days*24*60*60*1000;
     localStorage.setItem('sp_pro','true');
-    localStorage.setItem('sp_pro_exp',(Date.now()+gift.days*24*60*60*1000).toString());
+    localStorage.setItem('sp_pro_exp',expMs.toString());
+    var usedCodes=JSON.parse(localStorage.getItem('sp_used_codes')||'[]');
     usedCodes.push(code);
     localStorage.setItem('sp_used_codes',JSON.stringify(usedCodes));
-    msg.className='promo-msg ok';msg.textContent='✅ ¡Pro '+gift.label+' activado!';
+    msg.className='promo-msg ok';msg.textContent='✅ ¡Pro '+data.label+' activado!';
     input.value='';
     updateFotoUI();
     if(typeof scheduleSave==='function')scheduleSave();
-    setTimeout(function(){showToast('🎁 ¡Código canjeado! Pro '+gift.label)},800);
-  } else {
-    msg.className='promo-msg err';msg.textContent='❌ Código no válido';
-    input.select();
+    setTimeout(function(){showToast('🎁 ¡Código canjeado! Pro '+data.label)},800);
+  }catch(err){
+    console.error('Redeem error:',err);
+    msg.className='promo-msg err';msg.textContent='❌ Error al canjear: '+err.message;
+  }finally{
+    btn.disabled=false;btn.textContent='Canjear';
   }
 }
 
