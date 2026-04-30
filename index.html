@@ -1294,7 +1294,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',
   // Hide search on Pro tab
   const usWrap=document.getElementById('usearch-wrap');
   const usRes=document.getElementById('usearch-results');
-  if(btn.dataset.tab==='pro'||btn.dataset.tab==='contacto'){usWrap.style.display='none';usRes.style.display='none';}
+  if(btn.dataset.tab==='pro'||btn.dataset.tab==='contacto'||btn.dataset.tab==='diario'){usWrap.style.display='none';usRes.style.display='none';}
   else{usWrap.style.display='block';}
   if(btn.dataset.tab==='diario')renderDiary();
 }));
@@ -1937,15 +1937,31 @@ function renderDiaryList(){
         </div>
       </div>
       <div class="diary-day-body">
-        ${d.items.map(i=>{
+        ${d.items.map((i,ii)=>{
+          const delBtn=`<button onclick="event.stopPropagation();diaryRemoveItem('${k}',${ii})" style="background:none;border:none;color:var(--brown-l);cursor:pointer;font-size:.9rem;padding:2px 4px;flex-shrink:0;opacity:.6;transition:opacity .2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'" title="Eliminar">✕</button>`;
           if(i.isFSI){
-            return `<div class="diary-item" style="background:var(--purple-bg,rgba(107,91,138,.09));border-radius:8px;padding:8px;margin:4px 0"><span class="di-name" style="color:var(--purple,#6B5B8A);font-weight:500">${i.name} <span style="font-size:.7rem;color:var(--brown-l)">${i.time||''}</span></span><span class="di-hc" style="color:var(--purple,#6B5B8A)">FSI</span></div>`;
+            return `<div class="diary-item" style="background:var(--purple-bg,rgba(107,91,138,.09));border-radius:8px;padding:8px;margin:4px 0"><span class="di-name" style="color:var(--purple,#6B5B8A);font-weight:500">${i.name} <span style="font-size:.7rem;color:var(--brown-l)">${i.time||''}</span></span><span class="di-hc" style="color:var(--purple,#6B5B8A)">FSI</span>${delBtn}</div>`;
           }
-          return `<div class="diary-item"><span class="di-name">${i.name} <span style="font-size:.7rem;color:var(--brown-l)">${i.time||''}</span></span><span class="di-hc">${i.hc}g</span></div>`;
+          return `<div class="diary-item"><span class="di-name">${i.name} <span style="font-size:.7rem;color:var(--brown-l)">${i.time||''}</span></span><span class="di-hc">${i.hc}g</span>${delBtn}</div>`;
         }).join('')}
       </div>
     </div>`;
   }).join('');
+}
+
+function diaryRemoveItem(dateKey,itemIdx){
+  const diary=getDiary();
+  if(!diary[dateKey])return;
+  diary[dateKey].items.splice(itemIdx,1);
+  if(diary[dateKey].items.length===0){
+    delete diary[dateKey];
+  } else {
+    diary[dateKey].totalHC=diary[dateKey].items.reduce((s,i)=>s+i.hc,0);
+  }
+  saveDiary(diary);
+  renderDiaryList();
+  renderDiaryChart();
+  showToast('🗑 Eliminado del diario');
 }
 
 function renderDiaryChart(){
@@ -2248,6 +2264,8 @@ function toggleAuthMode(){
 function showAuthError(msg){const e=document.getElementById('authError');e.textContent=msg;e.style.display='block'}
 function hideAuthError(){document.getElementById('authError').style.display='none'}
 
+let isNewRegistration=false;
+
 function authSubmit(){
   const email=document.getElementById('authEmail').value.trim();
   const pass=document.getElementById('authPass').value;
@@ -2257,12 +2275,14 @@ function authSubmit(){
   const btn=document.getElementById('authBtn');
   btn.disabled=true;btn.textContent='Cargando...';
   hideAuthError();
+  isNewRegistration=(authMode==='register');
   const fn=authMode==='login'
     ?auth.signInWithEmailAndPassword(email,pass)
     :auth.createUserWithEmailAndPassword(email,pass);
   fn.then(()=>{btn.disabled=false;closeAuthScreen()})
     .catch(err=>{
       btn.disabled=false;
+      isNewRegistration=false;
       btn.textContent=authMode==='login'?'Entrar':'Crear cuenta';
       const msgs={
         'auth/invalid-email':'Email no válido',
@@ -2278,10 +2298,27 @@ function authSubmit(){
 }
 function authGoogle(){
   if(!auth){showAuthError('Firebase no disponible. Recarga la página.');return}
+  isNewRegistration=true; // Will check metadata below
   const provider=new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(err=>{
+    isNewRegistration=false;
     if(err.code!=='auth/popup-closed-by-user')showAuthError('Error con Google: '+err.message);
   });
+}
+
+function sendWelcomeEmail(user){
+  if(typeof emailjs==='undefined')return;
+  try{
+    const userName=(user.displayName||user.email||'').split('@')[0]||'usuario';
+    emailjs.send('service_i0r8u8l','template_bqjcc04',{
+      user_name:userName,
+      user_email:user.email
+    }).then(()=>{
+      console.log('Welcome email sent');
+    }).catch(err=>{
+      console.log('Welcome email error:',err);
+    });
+  }catch(e){console.log('Welcome email error:',e);}
 }
 function resetPassword(){
   const email=document.getElementById('authEmail').value.trim();
@@ -2382,6 +2419,14 @@ if(auth){
       userBar.style.display='flex';
       document.getElementById('loginBtn').style.display='none';
       document.getElementById('userEmail').textContent=user.email||user.displayName||'';
+
+      // Check if truly new user (for Google sign-in: compare creation time)
+      const isGoogleNew=user.metadata&&user.metadata.creationTime===user.metadata.lastSignInTime;
+      if(isNewRegistration||(isGoogleNew&&isNewRegistration)){
+        sendWelcomeEmail(user);
+        isNewRegistration=false;
+      }
+
       await loadUserData();
       renderCustomDishes();renderSheet();updateFotoUI();applyTheme(getTheme());renderDiary();
     } else {
