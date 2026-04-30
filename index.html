@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YZZLP0N0LN"></script>
@@ -64,7 +65,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 .panel{display:none;}
 .panel.active{display:block;}
 
-.search-wrap{position:relative;margin-bottom:4px;}
+.search-wrap{position:relative;margin-bottom:14px;}
 .search-wrap input{width:100%;padding:13px 16px 13px 44px;background:var(--white);border:1.5px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--brown);outline:none;-webkit-appearance:none;transition:border-color 0.2s;}
 .search-wrap input:focus{border-color:var(--terra);}
 .search-wrap input::placeholder{color:var(--brown-l);}
@@ -224,11 +225,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 .share-btn:active{transform:scale(.9);}
 .hdr-right{display:flex;align-items:center;gap:4px;}
 
-.usearch{padding:0 0 10px;}
+.usearch{padding:0 0 16px;}
 .usearch input{width:100%;padding:13px 16px 13px 44px;background:var(--white);border:1.5px solid var(--terra);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--brown);outline:none;-webkit-appearance:none;}
 .usearch input::placeholder{color:var(--brown-l);}
 .usearch .si{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.05rem;pointer-events:none;}
-.ures{margin-bottom:14px;}
+.ures{margin-bottom:18px;}
 .ures-cat{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--brown-l);font-weight:700;margin:8px 0 6px;}
 .ures-item{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s;}
 .ures-item:active{transform:scale(.98);border-color:var(--terra);}
@@ -395,6 +396,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
   <div class="hdr-right">
     <button id="loginBtn" onclick="showAuthScreen('Inicia sesión para sincronizar tus datos y usar Foto IA')" style="background:none;border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:5px 10px;font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;display:none">Entrar</button>
     <button class="share-btn" onclick="shareWhatsApp()" title="Compartir">📤</button>
+    <button class="share-btn" onclick="document.querySelector('[data-tab=contacto]').click()" title="Contacto" style="font-size:.9rem">💬</button>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Modo oscuro">🌙</button>
     <button class="plate-fab" id="fab" onclick="openSheet()">
       🍽️ Mi plato <span class="fab-count" id="fab-count">0g</span>
@@ -409,12 +411,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
   <button class="tab-btn" data-tab="misplatos"><span class="ti">⭐</span>Mis platos</button>
   <button class="tab-btn" data-tab="foto"><span class="ti">📸</span>Foto</button>
   <button class="tab-btn" data-tab="diario"><span class="ti">📋</span>Diario</button>
+  <button class="tab-btn" data-tab="contacto"><span class="ti">💬</span>Contacto</button>
   <button class="tab-btn" data-tab="pro" id="tab-pro"><span class="ti">👑</span>Pro</button>
 </div>
 
 <div class="scroll-area">
   <!-- Universal search -->
-  <div class="usearch" id="usearch-wrap" style="display:none;padding:10px 14px 0;">
+  <div class="usearch" id="usearch-wrap" style="display:none;padding:10px 14px 14px;">
     <div class="search-wrap" style="margin-bottom:0">
       <span class="si">🔍</span>
       <input type="text" id="usearch-input" placeholder="Buscar en todo...">
@@ -583,11 +586,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
       <div style="display:flex;gap:8px;margin-bottom:10px">
         <div style="flex:1">
           <label class="flabel">DDT (unidades/día)</label>
-          <input class="finput" id="fsi-ddt" type="number" inputmode="numeric" placeholder="Ej: 40" style="margin-bottom:0" oninput="calcFSI()">
+          <input class="finput" id="fsi-ddt" type="number" inputmode="numeric" placeholder="Ej: 40" style="margin-bottom:0" oninput="handleFSIInput()">
         </div>
         <div style="flex:1">
           <label class="flabel">Tipo insulina</label>
-          <select class="finput" id="fsi-type" style="margin-bottom:0;-webkit-appearance:menulist" onchange="calcFSI()">
+          <select class="finput" id="fsi-type" style="margin-bottom:0;-webkit-appearance:menulist" onchange="handleFSIInput()">
             <option value="1800">Rápida (1800)</option>
             <option value="1500">Regular (1500)</option>
           </select>
@@ -602,7 +605,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
         <div style="display:flex;gap:8px;margin-bottom:8px">
           <div style="flex:1">
             <label class="flabel">Ratio I:HC (tu médico)</label>
-            <input class="finput" id="fsi-ratio" type="number" inputmode="decimal" placeholder="Ej: 10" style="margin-bottom:0" oninput="calcFSI()">
+            <input class="finput" id="fsi-ratio" type="number" inputmode="decimal" placeholder="Ej: 10" style="margin-bottom:0" oninput="handleFSIInput()">
           </div>
           <div style="flex:1">
             <label class="flabel">HC del plato actual</label>
@@ -616,6 +619,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
         </div>
       </div>
       <div style="font-size:.68rem;color:var(--brown-l);margin-top:10px;line-height:1.4;text-align:center">⚠️ Herramienta orientativa. <strong>Consulta siempre con tu médico</strong> antes de ajustar cualquier dosis de insulina.</div>
+      <button onclick="saveFSItoDiary()" style="width:100%;background:var(--purple,#6B5B8A);color:white;border:none;border-radius:11px;padding:12px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;margin-top:10px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px" id="fsi-save-btn">📋 Registrar en diario</button>
     </div>
 
     <!-- Export PDF button -->
@@ -625,12 +629,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
     <div style="font-size:.68rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--brown-m);margin-bottom:8px">Historial</div>
     <div id="diary-list"></div>
 
-    <!-- Pro gate overlay if not pro -->
-    <div id="diary-gate" style="display:none;text-align:center;padding:40px 16px">
-      <div style="font-size:2.5rem;margin-bottom:12px">🔒</div>
-      <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500;margin-bottom:8px;color:var(--brown)">Función Pro</div>
-      <div style="font-size:.82rem;color:var(--brown-l);margin-bottom:16px;line-height:1.5">El diario de comidas, gráficas, favoritos, calculadora FSI y exportar PDF son funciones de SinPicos Pro.</div>
-      <button onclick="document.querySelector('[data-tab=pro]').click()" style="background:var(--gold);color:white;border:none;border-radius:14px;padding:14px 28px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer">👑 Ver planes Pro</button>
+    <!-- Pro upgrade banner (shown inside diary for free users) -->
+    <div id="diary-pro-banner" style="display:none;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);border-radius:18px;padding:22px 20px;margin-top:16px;text-align:center;color:white;">
+      <div style="font-size:1.8rem;margin-bottom:8px;">👑</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:500;margin-bottom:6px;">Desbloquea todo con Pro</div>
+      <div style="font-size:.8rem;opacity:.85;line-height:1.5;margin-bottom:14px;">Registra tus comidas, calcula tu FSI, exporta PDF y mucho más.</div>
+      <button onclick="document.querySelector('[data-tab=pro]').click()" style="background:var(--gold);color:white;border:none;border-radius:14px;padding:12px 28px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer">👑 Ver planes Pro</button>
     </div>
   </div>
 
@@ -678,8 +682,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
           <strong>📋 Diario de comidas</strong><br>
           <strong>📈 Gráfica semanal HC</strong><br>
           <strong>⭐ Platos favoritos</strong><br>
-          <strong>📊 Exportar PDF</strong><br>
+          <strong>📊 Exportar PDF completo</strong><br>
           <strong>🧮 Calculadora FSI</strong><br>
+          <strong>📝 Registro FSI en diario</strong><br>
           <strong>📱 Modo offline</strong>
         </div>
       </div>
@@ -731,6 +736,38 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 
   </div>
 
+  <!-- PANEL: CONTACTO Y SUGERENCIAS -->
+  <div class="panel" id="panel-contacto">
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:2.5rem;margin-bottom:8px">💬</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:500;color:var(--brown);margin-bottom:4px">Contacto y sugerencias</div>
+      <div style="font-size:.82rem;color:var(--brown-l);line-height:1.5">¿Tienes alguna idea, sugerencia o necesitas ayuda?<br>Escríbenos y te contestaremos lo antes posible.</div>
+    </div>
+
+    <div class="form-card">
+      <label class="flabel">Tu nombre (opcional)</label>
+      <input class="finput" id="contact-name" type="text" placeholder="Ej: María">
+      <label class="flabel">Tu email (para responderte)</label>
+      <input class="finput" id="contact-email" type="email" placeholder="tucorreo@ejemplo.com">
+      <label class="flabel">Mensaje</label>
+      <textarea id="contact-msg" placeholder="Cuéntanos qué te gustaría mejorar, qué platos echas de menos, cualquier idea o problema..." style="width:100%;padding:12px 13px;border:1.5px solid var(--border);border-radius:11px;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--brown);outline:none;background:var(--cream);-webkit-appearance:none;resize:vertical;min-height:110px;transition:border-color .2s;margin-bottom:4px"></textarea>
+      <button onclick="sendContactMsg()" style="width:100%;background:var(--terra);color:white;border:none;border-radius:12px;padding:14px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:10px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px" id="contact-send-btn">📨 Enviar mensaje</button>
+      <div id="contact-status" style="display:none;font-size:.82rem;margin-top:8px;padding:8px 12px;border-radius:10px;text-align:center"></div>
+    </div>
+
+    <div style="background:rgba(92,122,95,0.08);border:1.5px solid rgba(92,122,95,0.2);border-radius:14px;padding:14px 16px;margin-top:14px;">
+      <div style="font-size:.82rem;color:var(--sage);line-height:1.6;">
+        <strong style="display:block;margin-bottom:4px;">📬 Te respondemos siempre</strong>
+        Cada mensaje nos llega directamente. Si dejas tu email, te contestaremos lo antes posible.
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:24px 8px 8px;font-size:.7rem;color:var(--brown-l);line-height:1.5;">
+      SinPicos · Hecho con ❤️ para diabéticos<br>
+      Tus sugerencias nos ayudan a mejorar cada día
+    </div>
+  </div>
+
 </div>
 
 <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
@@ -744,6 +781,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown)
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- EmailJS SDK (envío de emails sin exponer dirección) -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  // ═══ EMAILJS INIT ═══
+  // INSTRUCCIONES: Regístrate gratis en https://www.emailjs.com
+  // 1. Crea una cuenta → Email Services → añade Gmail con saludsinpicos@gmail.com
+  // 2. Copia el Service ID (ej: service_xxxxx)
+  // 3. Email Templates → crea una plantilla con variables: {{from_name}}, {{from_email}}, {{message}}, {{plan}}, {{date}}
+  // 4. Copia el Template ID (ej: template_xxxxx)
+  // 5. Account → copia tu Public Key
+  // 6. Sustituye los 3 valores de abajo:
+  (function(){try{emailjs.init("j_1J2J8Mexj5vXW1P");}catch(e){console.log('EmailJS no disponible');}})();
+</script>
 
 <script>
 const DISHES=[
@@ -911,6 +962,21 @@ const FOODS=[
   {id:113,cat:'otros',name:'Hummus',hcPer100:10,portions:[{name:'Ración 100g',g:100}]},
   {id:114,cat:'otros',name:'Turrón Alicante/Jijona',hcPer100:55,portions:[{name:'1/6 tableta 50g',g:50}]},
   {id:115,cat:'otros',name:'Palomitas',hcPer100:50,portions:[{name:'Ración 20g',g:20}]},
+  {id:116,cat:'otros',name:'Azúcar moreno',hcPer100:97,portions:[{name:'Sobre 8g',g:8},{name:'Cucharada 20g',g:20}]},
+  {id:117,cat:'otros',name:'Panela',hcPer100:95,portions:[{name:'Cucharada 10g',g:10},{name:'Cucharada grande 20g',g:20}]},
+  {id:118,cat:'otros',name:'Nocilla / Nutella',hcPer100:56,portions:[{name:'Cucharada 15g',g:15},{name:'Ración generosa 30g',g:30}]},
+  {id:119,cat:'otros',name:'Mantequilla',hcPer100:0.6,portions:[{name:'Porción 10g',g:10},{name:'Cucharada 15g',g:15}]},
+  {id:120,cat:'otros',name:'Harina de trigo',hcPer100:73,portions:[{name:'Cucharada 15g',g:15},{name:'Taza 120g',g:120}]},
+  {id:121,cat:'otros',name:'Tortilla de trigo (wrap)',hcPer100:47,portions:[{name:'Unidad 60g',g:60}]},
+  {id:122,cat:'otros',name:'Bizcocho casero',hcPer100:52,portions:[{name:'Porción 80g',g:80}]},
+  {id:123,cat:'otros',name:'Tostada de arroz',hcPer100:80,portions:[{name:'Unidad 8g',g:8},{name:'2 unidades 16g',g:16}]},
+  {id:124,cat:'otros',name:'Barrita de cereales',hcPer100:65,portions:[{name:'Unidad 25g',g:25}]},
+  {id:125,cat:'otros',name:'Zumo de manzana',hcPer100:12,portions:[{name:'Vaso 200ml',g:200}]},
+  {id:126,cat:'bebidas',name:'Batido de chocolate',hcPer100:12,portions:[{name:'Vaso 200ml',g:200}]},
+  {id:127,cat:'otros',name:'Corn flakes',hcPer100:84,portions:[{name:'Ración 30g',g:30},{name:'Grande 50g',g:50}]},
+  {id:128,cat:'otros',name:'Empanada (masa)',hcPer100:35,portions:[{name:'Porción 100g',g:100}]},
+  {id:129,cat:'otros',name:'Maicena (fécula de maíz)',hcPer100:87,portions:[{name:'Cucharada 10g',g:10}]},
+  {id:130,cat:'otros',name:'Gelatina azucarada',hcPer100:16,portions:[{name:'Tarrina 100g',g:100}]},
 ];
 
 let plate=[];
@@ -1038,6 +1104,12 @@ function foodHTML(f){
       <span class="cw-result" id="cwr-${f.id}">—</span>
       <button class="cw-btn" data-fid="${f.id}" onclick="cwAdd(this)">➕ Añadir</button>
     </div>
+    <div class="cw-wrap" style="border-top:none;padding-top:0;margin-top:4px">
+      <span class="cw-label">Porciones:</span>
+      <input type="number" class="cw-input" min="0.1" max="20" step="0.1" placeholder="uds" data-hc="${f.hcPer100}" data-name="${esc}" data-defg="${f.portions[0]?f.portions[0].g:100}" oninput="cwCalcPortion(this,${f.id})">
+      <span class="cw-result" id="cwp-${f.id}">—</span>
+      <button class="cw-btn" data-fid="${f.id}" onclick="cwAddPortion(this)">➕ Añadir</button>
+    </div>
   </div>`;
 }
 function cwCalc(inp){
@@ -1060,6 +1132,32 @@ function cwAdd(btn){
   inp.value='';
   const fid=btn.dataset.fid;
   document.getElementById('cwr-'+fid).textContent='—';
+}
+function cwCalcPortion(inp,fid){
+  const qty=parseFloat(inp.value);
+  const defg=parseInt(inp.dataset.defg)||100;
+  const hc100=parseFloat(inp.dataset.hc);
+  const span=document.getElementById('cwp-'+fid);
+  if(qty>0){
+    const totalG=Math.round(defg*qty);
+    span.textContent=Math.round(hc100*totalG/100)+'g HC';
+  } else {span.textContent='—';}
+}
+function cwAddPortion(btn){
+  const wrap=btn.closest('.cw-wrap');
+  const inp=wrap.querySelector('.cw-input');
+  const qty=parseFloat(inp.value);
+  const defg=parseInt(inp.dataset.defg)||100;
+  const hc100=parseFloat(inp.dataset.hc);
+  const name=inp.dataset.name;
+  if(!qty||qty<=0){inp.focus();return;}
+  const totalG=Math.round(defg*qty);
+  const hc=Math.round(hc100*totalG/100);
+  const label=qty===1?'1 porción ('+totalG+'g)':qty+' porciones ('+totalG+'g)';
+  addItem(name, label, hc);
+  inp.value='';
+  const fid=btn.dataset.fid;
+  document.getElementById('cwp-'+fid).textContent='—';
 }
 document.getElementById('ing-cats').addEventListener('click',e=>{const btn=e.target.closest('.cat-btn');if(!btn)return;ingCat=btn.dataset.cat;ingSearch='';document.querySelectorAll('#ing-cats .cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderIngredients();});
 
@@ -1193,6 +1291,11 @@ document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  // Hide search on Pro tab
+  const usWrap=document.getElementById('usearch-wrap');
+  const usRes=document.getElementById('usearch-results');
+  if(btn.dataset.tab==='pro'||btn.dataset.tab==='contacto'){usWrap.style.display='none';usRes.style.display='none';}
+  else{usWrap.style.display='block';}
   if(btn.dataset.tab==='diario')renderDiary();
 }));
 
@@ -1252,7 +1355,17 @@ _usI.addEventListener('input',function(){
   _usR.style.display='block';
   var dR=DISHES.filter(function(x){return x.name.toLowerCase().indexOf(q)!==-1||x.desc.toLowerCase().indexOf(q)!==-1;}).slice(0,5);
   var fR=FOODS.filter(function(x){return x.name.toLowerCase().indexOf(q)!==-1;}).slice(0,5);
+  var cR=loadC().filter(function(x){return x.name.toLowerCase().indexOf(q)!==-1||(x.desc&&x.desc.toLowerCase().indexOf(q)!==-1);}).slice(0,5);
   var h='';
+  if(cR.length){
+    h+='<div class="ures-cat">⭐ Mis platos</div>';
+    for(var ci=0;ci<cR.length;ci++){var c=cR[ci];
+      h+='<div class="ures-item" data-utype="custom" data-uid="'+c.id+'">';
+      h+='<span class="uri-emoji">⭐</span>';
+      h+='<div class="uri-info"><div class="uri-name">'+c.name+'</div><div class="uri-desc">'+(c.desc||c.portion||'')+'</div></div>';
+      h+='<span class="uri-hc">'+c.hc+'g HC</span></div>';
+    }
+  }
   if(dR.length){
     h+='<div class="ures-cat">\u{1F37D}\uFE0F Platos</div>';
     for(var di=0;di<dR.length;di++){var x=dR[di];
@@ -1276,7 +1389,8 @@ _usI.addEventListener('input',function(){
   _usR.querySelectorAll('.ures-item').forEach(function(el){
     el.addEventListener('click',function(){
       var type=el.dataset.utype;var id=el.dataset.uid;
-      if(type==='dish'){var d=DISHES.find(function(x){return x.id===id;});if(d)usearchAdd(d.name,'Plato completo',d.hc);}
+      if(type==='custom'){var c=loadC().find(function(x){return x.id===parseInt(id);});if(c)usearchAdd(c.name,c.portion||'Ración completa',c.hc);}
+      else if(type==='dish'){var d=DISHES.find(function(x){return x.id===id;});if(d)usearchAdd(d.name,'Plato completo',d.hc);}
       else{var f=FOODS.find(function(x){return x.id===parseInt(id);});if(f){var po=f.portions[0];usearchAdd(f.name,po.name,Math.round(f.hcPer100*po.g/100));}}
     });
   });
@@ -1579,22 +1693,32 @@ function diaryAddEntry(name,portion,hc){
 
 function renderDiary(){
   const isPro_=getPlan()==='pro';
-  const gate=document.getElementById('diary-gate');
   const chart=document.getElementById('diary-chart');
   const list=document.getElementById('diary-list');
   const favEl=document.getElementById('fav-list');
   const exportBtn=document.getElementById('export-pdf-btn');
   const fsiCalc=document.getElementById('fsi-calc');
+  const proBanner=document.getElementById('diary-pro-banner');
+
   if(!isPro_){
-    gate.style.display='block';
-    chart.style.display='none';
-    list.style.display='none';
-    favEl.style.display='none';
-    exportBtn.style.display='none';
-    if(fsiCalc)fsiCalc.style.display='none';
+    // Show everything as preview but with empty/demo data
+    chart.style.display='';
+    list.style.display='';
+    favEl.style.display='';
+    exportBtn.style.display='flex';
+    if(fsiCalc)fsiCalc.style.display='';
+    if(proBanner)proBanner.style.display='block';
+
+    // Render demo chart
+    renderDiaryChartDemo();
+    // Render demo diary list
+    renderDiaryListDemo();
+    // Render demo favorites
+    renderFavoritesDemo();
+    updateFSIPlateHC();
     return;
   }
-  gate.style.display='none';
+  if(proBanner)proBanner.style.display='none';
   chart.style.display='';
   list.style.display='';
   favEl.style.display='';
@@ -1606,7 +1730,110 @@ function renderDiary(){
   updateFSIPlateHC();
 }
 
+function handleFSIInput(){
+  if(getPlan()!=='pro'){
+    showProNeeded('La calculadora FSI es una función Pro. ¡Hazte Pro para calcular tu factor de sensibilidad!');
+    // Clear the inputs
+    document.getElementById('fsi-ddt').value='';
+    document.getElementById('fsi-result').style.display='none';
+    document.getElementById('fsi-plate-calc').style.display='none';
+    return;
+  }
+  calcFSI();
+}
+
+function showProNeeded(msg){
+  const existing=document.getElementById('pro-needed-modal');
+  if(existing)existing.remove();
+
+  const modal=document.createElement('div');
+  modal.id='pro-needed-modal';
+  modal.style.cssText='position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:24px;';
+  modal.innerHTML=`
+    <div style="background:var(--white);border-radius:24px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.15)">
+      <div style="font-size:2.5rem;margin-bottom:10px">👑</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--brown);margin-bottom:8px">Función Pro</div>
+      <div style="font-size:.85rem;color:var(--brown-m);line-height:1.5;margin-bottom:18px">${msg}</div>
+      <button onclick="this.closest('#pro-needed-modal').remove();document.querySelector('[data-tab=pro]').click()" style="width:100%;background:var(--gold);color:white;border:none;border-radius:14px;padding:14px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;margin-bottom:8px">👑 Ver planes Pro</button>
+      <button onclick="this.closest('#pro-needed-modal').remove()" style="width:100%;background:none;border:1.5px solid var(--border);border-radius:14px;padding:12px;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--brown-m);cursor:pointer">Cerrar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+function renderDiaryChartDemo(){
+  const el=document.getElementById('diary-chart');
+  const dayN=['D','L','M','X','J','V','S'];
+  const today=new Date();
+  const demoHC=[0,85,120,95,0,110,75];
+  const days=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    days.push({label:dayN[d.getDay()],hc:demoHC[6-i]});
+  }
+  const maxHC=Math.max(1,...days.map(d=>d.hc));
+  el.innerHTML=`<div class="chart-wrap" style="position:relative;overflow:hidden">
+    <h3>📈 Últimos 7 días</h3>
+    <div style="position:absolute;top:0;right:0;background:var(--gold);color:white;font-size:.6rem;font-weight:700;padding:3px 10px;border-radius:0 16px 0 10px;letter-spacing:.5px;z-index:2">DEMO</div>
+    <div class="chart-bars" style="opacity:.5;filter:blur(.5px)">${days.map(d=>{
+      const pct=maxHC?Math.round((d.hc/maxHC)*120):0;
+      return `<div class="chart-col"><div class="chart-val">${d.hc||''}</div><div class="chart-bar" style="height:${pct}px;opacity:${d.hc?1:.15}"></div><div class="chart-lbl">${d.label}</div></div>`;
+    }).join('')}</div>
+    <div class="chart-avg" style="opacity:.5">
+      <div class="chart-avg-item"><span class="ca-val">97g</span><span class="ca-lbl">HC/día</span></div>
+      <div class="chart-avg-item"><span class="ca-val">9.7</span><span class="ca-lbl">Rac/día</span></div>
+      <div class="chart-avg-item"><span class="ca-val">5/7</span><span class="ca-lbl">Días registrados</span></div>
+    </div>
+  </div>`;
+}
+
+function renderDiaryListDemo(){
+  const el=document.getElementById('diary-list');
+  const today=new Date();
+  const dayNames=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const demoItems=[
+    {name:'Tostada con aceite',time:'08:30',hc:25},
+    {name:'Café con leche',time:'08:30',hc:7},
+    {name:'Paella',time:'14:00',hc:50},
+    {name:'Yogur natural',time:'17:00',hc:6},
+    {name:'Merluza con patatas',time:'21:00',hc:18}
+  ];
+  const date=today;
+  const label=dayNames[date.getDay()]+' '+date.getDate()+'/'+(date.getMonth()+1);
+  el.innerHTML=`<div style="position:relative">
+    <div style="position:absolute;top:0;right:0;background:var(--gold);color:white;font-size:.6rem;font-weight:700;padding:3px 10px;border-radius:0 14px 0 10px;letter-spacing:.5px;z-index:2">DEMO</div>
+    <div class="diary-day open" style="opacity:.55;pointer-events:none">
+      <div class="diary-day-hdr">
+        <span class="dd-date">${label}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="dd-hc">106g HC · 10.6 rac</span>
+          <span class="dd-arrow">▾</span>
+        </div>
+      </div>
+      <div class="diary-day-body" style="display:block">
+        ${demoItems.map(i=>`<div class="diary-item"><span class="di-name">${i.name} <span style="font-size:.7rem;color:var(--brown-l)">${i.time}</span></span><span class="di-hc">${i.hc}g</span></div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderFavoritesDemo(){
+  const el=document.getElementById('fav-list');
+  const demoFavs=[
+    {name:'Tostada con aceite',hc:25},
+    {name:'Paella',hc:50},
+    {name:'Yogur natural',hc:6},
+  ];
+  el.innerHTML=`<div style="position:relative">
+    <div style="opacity:.55;pointer-events:none;display:flex;flex-wrap:wrap;gap:8px">${demoFavs.map(f=>
+      `<div class="fav-chip">${f.name} <span class="fav-hc">${f.hc}g</span></div>`
+    ).join('')}</div>
+  </div>`;
+}
+
 // ═══ PRO: FSI CALCULATOR ═══
+let lastFSISaved = null; // track to avoid duplicate saves
 function calcFSI(){
   const ddt=parseFloat(document.getElementById('fsi-ddt').value);
   const rule=parseInt(document.getElementById('fsi-type').value);
@@ -1641,6 +1868,46 @@ function calcFSI(){
   }
 }
 
+function saveFSItoDiary(){
+  if(getPlan()!=='pro'){showProNeeded('Registrar el FSI en tu diario es una función Pro. ¡Hazte Pro para llevar un seguimiento completo!');return;}
+  const ddt=parseFloat(document.getElementById('fsi-ddt').value);
+  const rule=parseInt(document.getElementById('fsi-type').value);
+  if(!ddt||ddt<=0)return;
+  const fsi=Math.round(rule/ddt);
+  const ratio=parseFloat(document.getElementById('fsi-ratio').value);
+  const plateHC=plate.reduce((s,i)=>s+i.hc,0);
+  const raciones=(ratio>0&&plateHC>0)?(plateHC/ratio).toFixed(1):null;
+  
+  // Build unique key to avoid duplicates
+  const saveKey=ddt+'-'+rule+'-'+(ratio||0)+'-'+plateHC;
+  if(lastFSISaved===saveKey)return;
+  lastFSISaved=saveKey;
+
+  const key=new Date().toISOString().slice(0,10);
+  const diary=getDiary();
+  if(!diary[key])diary[key]={items:[],totalHC:0};
+  
+  let fsiText='🧮 FSI: '+fsi+' mg/dL (DDT:'+ddt+', regla '+rule+')';
+  if(raciones) fsiText+=' · Dosis: '+raciones+' rac para '+plateHC+'g HC';
+  
+  diary[key].items.push({
+    name:fsiText,
+    portion:'Factor sensibilidad',
+    hc:0,
+    isFSI:true,
+    fsiData:{ddt:ddt,rule:rule,fsi:fsi,ratio:ratio||null,plateHC:plateHC,raciones:raciones},
+    time:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})
+  });
+  // Preserve totalHC without adding FSI (which is 0 HC)
+  diary[key].totalHC=diary[key].items.reduce((s,i)=>s+i.hc,0);
+  const keys=Object.keys(diary).sort().reverse().slice(0,30);
+  const trimmed={};keys.forEach(k=>trimmed[k]=diary[k]);
+  saveDiary(trimmed);
+  renderDiaryList();
+  renderDiaryChart();
+  showToast('🧮 FSI registrado en tu diario');
+}
+
 function updateFSIPlateHC(){
   const el=document.getElementById('fsi-plate-hc');
   if(!el)return;
@@ -1670,7 +1937,12 @@ function renderDiaryList(){
         </div>
       </div>
       <div class="diary-day-body">
-        ${d.items.map(i=>`<div class="diary-item"><span class="di-name">${i.name} <span style="font-size:.7rem;color:var(--brown-l)">${i.time||''}</span></span><span class="di-hc">${i.hc}g</span></div>`).join('')}
+        ${d.items.map(i=>{
+          if(i.isFSI){
+            return `<div class="diary-item" style="background:var(--purple-bg,rgba(107,91,138,.09));border-radius:8px;padding:8px;margin:4px 0"><span class="di-name" style="color:var(--purple,#6B5B8A);font-weight:500">${i.name} <span style="font-size:.7rem;color:var(--brown-l)">${i.time||''}</span></span><span class="di-hc" style="color:var(--purple,#6B5B8A)">FSI</span></div>`;
+          }
+          return `<div class="diary-item"><span class="di-name">${i.name} <span style="font-size:.7rem;color:var(--brown-l)">${i.time||''}</span></span><span class="di-hc">${i.hc}g</span></div>`;
+        }).join('')}
       </div>
     </div>`;
   }).join('');
@@ -1685,23 +1957,29 @@ function renderDiaryChart(){
   for(let i=6;i>=0;i--){
     const d=new Date(today);d.setDate(today.getDate()-i);
     const k=d.toISOString().slice(0,10);
-    days.push({key:k,label:dayN[d.getDay()],num:d.getDate(),hc:diary[k]?diary[k].totalHC:0});
+    const dayData=diary[k];
+    const hc=dayData?dayData.totalHC:0;
+    const fsiCount=dayData?dayData.items.filter(it=>it.isFSI).length:0;
+    days.push({key:k,label:dayN[d.getDay()],num:d.getDate(),hc:hc,fsi:fsiCount});
   }
   const maxHC=Math.max(1,...days.map(d=>d.hc));
   const avgHC=days.filter(d=>d.hc>0);
   const avg=avgHC.length?Math.round(avgHC.reduce((s,d)=>s+d.hc,0)/avgHC.length):0;
   const avgRac=(avg/10).toFixed(1);
+  const totalFSI=days.reduce((s,d)=>s+d.fsi,0);
 
   el.innerHTML=`<div class="chart-wrap">
     <h3>📈 Últimos 7 días</h3>
     <div class="chart-bars">${days.map(d=>{
       const pct=maxHC?Math.round((d.hc/maxHC)*120):0;
-      return `<div class="chart-col"><div class="chart-val">${d.hc||''}</div><div class="chart-bar" style="height:${pct}px;opacity:${d.hc?1:.15}"></div><div class="chart-lbl">${d.label}</div></div>`;
+      const fsiDot=d.fsi?`<div style="font-size:.55rem;color:var(--purple,#6B5B8A);font-weight:700;margin-top:1px">🧮${d.fsi}</div>`:'';
+      return `<div class="chart-col"><div class="chart-val">${d.hc||''}</div><div class="chart-bar" style="height:${pct}px;opacity:${d.hc?1:.15}"></div><div class="chart-lbl">${d.label}</div>${fsiDot}</div>`;
     }).join('')}</div>
     <div class="chart-avg">
       <div class="chart-avg-item"><span class="ca-val">${avg}g</span><span class="ca-lbl">HC/día</span></div>
       <div class="chart-avg-item"><span class="ca-val">${avgRac}</span><span class="ca-lbl">Rac/día</span></div>
       <div class="chart-avg-item"><span class="ca-val">${avgHC.length}/7</span><span class="ca-lbl">Días registrados</span></div>
+      ${totalFSI?`<div class="chart-avg-item"><span class="ca-val">${totalFSI}</span><span class="ca-lbl">Cálculos FSI</span></div>`:''}
     </div>
   </div>`;
 }
@@ -1736,7 +2014,7 @@ function renderFavorites(){
 
 // ═══ PRO: EXPORT PDF ═══
 function exportPDF(){
-  if(getPlan()!=='pro'){document.querySelector('[data-tab=pro]').click();return;}
+  if(getPlan()!=='pro'){showProNeeded('Exportar PDF es una función Pro. ¡Hazte Pro para exportar tus datos con todo detalle!');return;}
   const diary=getDiary();
   const keys=Object.keys(diary).sort().reverse().slice(0,7);
   if(!keys.length&&!plate.length){showToast('❌ No hay datos para exportar');return;}
@@ -1765,8 +2043,55 @@ function exportPDF(){
     html+='<table><tr><th>Fecha</th><th>Comidas</th><th style="text-align:right">HC total</th><th style="text-align:right">Raciones</th></tr>';
     keys.forEach(k=>{
       const d=diary[k];const date=new Date(k+'T12:00:00');
-      html+='<tr><td>'+date.toLocaleDateString('es-ES',{day:'numeric',month:'short'})+'</td><td>'+d.items.length+'</td><td style="text-align:right">'+d.totalHC+'g</td><td style="text-align:right">'+(d.totalHC/10).toFixed(1)+'</td></tr>';
+      html+='<tr><td>'+date.toLocaleDateString('es-ES',{day:'numeric',month:'short'})+'</td><td>'+d.items.filter(i=>!i.isFSI).length+'</td><td style="text-align:right">'+d.totalHC+'g</td><td style="text-align:right">'+(d.totalHC/10).toFixed(1)+'</td></tr>';
     });
+    html+='</table>';
+
+    // Detailed food log per day
+    html+='<h2>📋 Detalle por día</h2>';
+    keys.forEach(k=>{
+      const d=diary[k];const date=new Date(k+'T12:00:00');
+      const dateLabel=date.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+      html+='<h3 style="font-size:.95rem;color:#6B4F3A;margin:14px 0 6px;text-transform:capitalize">'+dateLabel+'</h3>';
+      html+='<table><tr><th>Hora</th><th>Alimento</th><th style="text-align:right">HC</th></tr>';
+      d.items.filter(i=>!i.isFSI).forEach(i=>{
+        html+='<tr><td>'+(i.time||'—')+'</td><td>'+i.name+'</td><td style="text-align:right">'+i.hc+'g</td></tr>';
+      });
+      html+='<tr><td colspan="2" class="total">Total del día</td><td style="text-align:right" class="total">'+d.totalHC+'g HC ('+(d.totalHC/10).toFixed(1)+' rac)</td></tr></table>';
+    });
+  }
+
+  // FSI calculations section
+  const allFSI=[];
+  Object.keys(diary).sort().reverse().forEach(k=>{
+    const d=diary[k];
+    d.items.filter(i=>i.isFSI&&i.fsiData).forEach(i=>{
+      allFSI.push({date:k,time:i.time,data:i.fsiData});
+    });
+  });
+  if(allFSI.length){
+    html+='<h2>🧮 Registro de Factor de Sensibilidad (FSI)</h2>';
+    html+='<table><tr><th>Fecha</th><th>Hora</th><th>DDT</th><th>Regla</th><th>FSI</th><th>Ratio</th><th>HC plato</th><th>Dosis</th></tr>';
+    allFSI.forEach(f=>{
+      const date=new Date(f.date+'T12:00:00');
+      html+='<tr><td>'+date.toLocaleDateString('es-ES',{day:'numeric',month:'short'})+'</td>';
+      html+='<td>'+(f.time||'—')+'</td>';
+      html+='<td>'+f.data.ddt+' U</td>';
+      html+='<td>'+f.data.rule+'</td>';
+      html+='<td style="font-weight:700;color:#B85C38">'+f.data.fsi+' mg/dL</td>';
+      html+='<td>'+(f.data.ratio||'—')+'</td>';
+      html+='<td>'+(f.data.plateHC||'—')+'g</td>';
+      html+='<td>'+(f.data.raciones?f.data.raciones+' rac':'—')+'</td></tr>';
+    });
+    html+='</table>';
+  }
+
+  // Favorites section
+  const favs=getFavs();
+  if(favs.length){
+    html+='<h2>⭐ Platos favoritos</h2>';
+    html+='<table><tr><th>Plato</th><th style="text-align:right">HC</th></tr>';
+    favs.forEach(f=>{html+='<tr><td>'+f.name+'</td><td style="text-align:right">'+f.hc+'g</td></tr>';});
     html+='</table>';
   }
 
@@ -1776,6 +2101,67 @@ function exportPDF(){
   const w=window.open('','_blank');
   if(w){w.document.write(html);w.document.close();setTimeout(()=>w.print(),500);}
   else{showToast('❌ Permite ventanas emergentes para exportar');}
+}
+
+// ═══ CONTACT / SUGGESTIONS ═══
+function sendContactMsg(){
+  const name=document.getElementById('contact-name').value.trim();
+  const email=document.getElementById('contact-email').value.trim();
+  const msg=document.getElementById('contact-msg').value.trim();
+  const status=document.getElementById('contact-status');
+  const btn=document.getElementById('contact-send-btn');
+
+  if(!msg){
+    status.style.display='block';status.style.background='rgba(200,60,60,.08)';status.style.color='#c44';
+    status.textContent='Escribe un mensaje antes de enviar';
+    return;
+  }
+
+  btn.disabled=true;btn.innerHTML='⏳ Enviando...';
+
+  const feedbackData={
+    from_name:name||'Anónimo',
+    from_email:email||'No indicado',
+    message:msg,
+    plan:getPlan(),
+    date:new Date().toLocaleString('es-ES'),
+    user_account:(typeof currentUser!=='undefined'&&currentUser)?currentUser.email:'Sin cuenta'
+  };
+
+  // 1) Enviar email vía EmailJS (te llega al correo directamente)
+  let emailSent=false;
+  const emailPromise=(typeof emailjs!=='undefined')
+    ? emailjs.send('service_i0r8u8l','template_g3afiqg',feedbackData)
+        .then(()=>{emailSent=true;})
+        .catch(err=>{console.log('EmailJS error:',err);})
+    : Promise.resolve();
+
+  // 2) Guardar también en Firestore como respaldo
+  const firestorePromise=(typeof db!=='undefined'&&db)
+    ? db.collection('feedback').add({
+        name:feedbackData.from_name,
+        email:feedbackData.from_email,
+        msg:msg,
+        plan:getPlan(),
+        userId:(typeof currentUser!=='undefined'&&currentUser)?currentUser.uid:null,
+        userEmail:(typeof currentUser!=='undefined'&&currentUser)?currentUser.email:null,
+        timestamp:firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(err=>{console.log('Firestore feedback error:',err);})
+    : Promise.resolve();
+
+  // Esperar a ambos
+  Promise.all([emailPromise,firestorePromise]).then(()=>{
+    status.style.display='block';status.style.background='rgba(92,122,95,.1)';status.style.color='var(--sage)';
+    status.textContent='✅ ¡Mensaje enviado! Te responderemos lo antes posible.';
+    btn.disabled=false;btn.innerHTML='📨 Enviar mensaje';
+    document.getElementById('contact-msg').value='';
+    document.getElementById('contact-name').value='';
+    document.getElementById('contact-email').value='';
+  }).catch(()=>{
+    status.style.display='block';status.style.background='rgba(200,60,60,.08)';status.style.color='#c44';
+    status.textContent='❌ Error al enviar. Comprueba tu conexión e inténtalo de nuevo.';
+    btn.disabled=false;btn.innerHTML='📨 Reintentar';
+  });
 }
 
 // ═══ OFFLINE MODE ═══
