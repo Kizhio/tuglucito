@@ -2310,7 +2310,7 @@ function sendWelcomeEmail(user){
   if(typeof emailjs==='undefined')return;
   try{
     const userName=(user.displayName||user.email||'').split('@')[0]||'usuario';
-    emailjs.send('service_i0r8u8l','template_bqjcc04',{
+    emailjs.send('service_i0r8u8l','template_bcjcc04',{
       user_name:userName,
       user_email:user.email
     }).then(()=>{
